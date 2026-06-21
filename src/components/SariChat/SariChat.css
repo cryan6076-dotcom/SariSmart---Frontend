@@ -1,0 +1,167 @@
+.ai-page{
+  height:100%;
+  min-height:unset;
+  background:#F5F5F5;
+  display:flex;
+  justify-content:center;
+  overflow: hidden; 
+}
+
+.ai-container{
+  width:100%;
+  max-width:420px;
+  padding:16px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  padding-bottom: 95px; 
+}
+
+.ai-header{
+  position: relative;
+  background:#6B3207;
+  color:white;
+  border-radius:16px;
+  padding:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  overflow: visible; 
+  flex-shrink: 0;
+}
+
+.ai-header h2{
+  margin:0;
+}
+
+.ai-header p{
+  margin-top:4px;
+}
+
+.chatbot{
+  position:absolute;
+  right:15px;
+  top:-25px; 
+  width: 130px;
+  height:auto;
+  z-index:10;
+}
+
+.prompt-grid{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:12px;
+  margin-bottom:20px;
+  flex-shrink: 0; 
+}
+
+.prompt-grid button{
+  border:1px solid #F36A06;
+  background:white;
+  color:#F36A06;
+  border-radius:10px;
+  padding:8px 12px;
+  cursor:pointer;
+}
+
+.chat-container{
+  margin-top:20px;
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.chat-container::-webkit-scrollbar {
+  display: none;
+}
+
+.message{
+  display:flex;
+  margin-bottom:16px;
+}
+
+.ai-message img{
+  width:40px;
+  height:40px;
+  margin-right:10px;
+}
+
+.bubble{
+  background:#F5EFE6;
+  padding:14px;
+  border-radius:12px;
+  max-width:260px;
+}
+
+.user-message{
+  justify-content:flex-end;
+}
+
+.user-bubble{
+  background:#F36A06;
+  color:white;
+  padding:12px 16px;
+  border-radius:14px;
+  max-width:240px;
+}
+
+.chat-input{
+  margin-top:20px;
+  display:flex;
+  border:1px solid #F36A06;
+  border-radius:12px;
+  overflow:hidden;
+  flex-shrink: 0; 
+}
+
+.chat-input input{
+  flex:1;
+  border:none;
+  padding:14px;
+  outline:none;
+}
+
+.chat-input button{
+  width:60px;
+  border:none;
+  background:#F36A06;
+  color:white;
+  font-size:18px;
+}
+
+.bottom-nav{
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 85px;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding-bottom: 10px;
+  border-top: 1px solid #ddd;
+  z-index: 50;
+}
+
+.bottom-nav div{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  font-size:13px;
+}
+
+.center-btn{
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  background:#F36A06;
+  color:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin-top:-30px;
+  font-size:28px;
+}
