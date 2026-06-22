@@ -6,6 +6,7 @@ import homeIcon from "../Assets/homeIcon.png"
 import invenIcon from "../Assets/invenIcon.png"
 import profileIcon from "../Assets/profileIcon.png"
 import statsIcon from "../Assets/statsIcon.png"
+import statsIcon2 from "../Assets/statsIcon2.png"
 import whiteSari from "../Assets/transparentSari.png"
 import SariAI from "../Assets/SariAIchat.png"
 
@@ -106,12 +107,12 @@ const SariSmartAI = ({ onNavigate }) => {
           <img src={whiteSari} alt="chat"/>
           </div>
 
-          <div onClick={() => onNavigate("insights")}>
-            <img src={statsIcon} alt="insights"/>
+          <div onClick={() => onNavigate("insights") }>
+            <img src={statsIcon2} alt="insights"/>
             <span>Insights</span>
           </div>
           
-          <div>
+          <div onClick={() => onNavigate("profile") }>
             <img src={profileIcon} alt="profile"/>
             <span>Profile</span>
           </div>

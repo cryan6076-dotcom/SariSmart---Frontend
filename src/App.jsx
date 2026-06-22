@@ -9,6 +9,7 @@ import SariChat from './components/SariChat/SariChat';
 import PhoneFrame from './components/PhoneFrame/PhoneFrame';
 import InsightsPage from './components/InsightsPage/InsightsPage'; 
 import ProductPerformance from './components/ProductPerformance/ProductPerformance'; 
+import ProfilePage from './components/ProfilePage/ProfilePage';
 
 export default function App() {
   const [screen, setScreen] = useState("launch")
@@ -63,7 +64,16 @@ export default function App() {
     );
   }
 
-  // 7. PRODUCT PERFORMANCE SCREEN
+  // 7. PROFILE SCREEN
+  if (screen === "profile") {
+    return (
+      <PhoneFrame>
+        <ProfilePage onNavigate={setScreen} />
+      </PhoneFrame>
+    );
+  }
+
+  // 8. PRODUCT PERFORMANCE SCREEN
   if (screen === "product-performance") {
     return (
       <PhoneFrame>

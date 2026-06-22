@@ -145,9 +145,9 @@ const Insights = ({ onNavigate }) => {
             <span>Insights</span>
           </div>
           
-          <div>
-            <img src={profileIcon} alt="profile"/>
-            <span>Profile</span>
+           <div onClick={() => onNavigate("profile")}>
+              <img src={profileIcon} alt="profile"/>
+              <span>Profile</span>
           </div>
         </div>
 
