@@ -1,0 +1,134 @@
+.perf-page {
+  height: 100%;
+  background: #F9F9F9;
+  display: flex;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+.perf-container {
+  width: 100%;
+  max-width: 420px;
+  padding: 16px;
+  padding-bottom: 100px;
+  box-sizing: border-box;
+}
+
+/* Header */
+.perf-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #6B3207;
+  cursor: pointer;
+  margin-right: 12px;
+}
+
+.perf-header h2 {
+  font-size: 20px;
+  color: #6B3207;
+  margin: 0;
+}
+
+/* Toggles */
+.toggle-container {
+  display: flex;
+  background: #FFF;
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  color: #555;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.toggle-btn.active {
+  background: #F36A06;
+  color: white;
+}
+
+/* Ranked List */
+.ranked-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.unranked-list {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 -4px 10px rgba(0,0,0,0.05); /* To create the overlapping effect */
+}
+
+.ranked-item {
+  display: flex;
+  align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.ranked-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.rank-num {
+  font-size: 18px;
+  font-weight: bold;
+  color: #F36A06;
+  width: 24px;
+}
+
+.perf-prod-img {
+  width: 45px;
+  height: 45px;
+  background: #FFF4E5;
+  border-radius: 8px;
+  margin-right: 12px;
+  padding: 4px;
+}
+
+.unranked-img {
+  margin-left: 10px; /* Aligns unranked list slightly differently if needed */
+}
+
+.perf-prod-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.perf-prod-name {
+  font-size: 13px;
+  font-weight: bold;
+  color: #333;
+}
+
+.perf-prod-sold {
+  font-size: 11px;
+  color: #888;
+  margin-top: 4px;
+}
+
+.perf-prod-val {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
