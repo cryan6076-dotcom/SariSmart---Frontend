@@ -415,7 +415,7 @@ export default function CreateLoginSetup({ onFinish }) {
             </div>
 
             <div className="social-button-row">
-              <button type="button" className="social-icon-btn">
+              <button type="button" className="social-icon-btn" onClick={() => window.location.href = 'http://localhost:3000/api/auth/google'}>
                 <img src={googleIcon} alt="Google" />
               </button>
               <button type="button" className="social-icon-btn">

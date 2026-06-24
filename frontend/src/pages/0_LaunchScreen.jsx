@@ -5,8 +5,27 @@ import whiteLogo from "../assets/icons/whitelogo-sarismart.png";
 export default function LaunchScreen() {
   const navigate = useNavigate(); // Initialized the navigator
 
-  // Auto-advance to onboarding after 2.5 seconds
+  // Auto-advance to onboarding after 2.5 seconds, or redirect to home if logged in via OAuth
   useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const token = searchParams.get('token');
+    const user = searchParams.get('user');
+
+    if (token) {
+      localStorage.setItem('token', token);
+      if (user) {
+        localStorage.setItem('user', decodeURIComponent(user));
+      }
+      navigate('/home');
+      return;
+    }
+
+    // If user is already logged in, skip the launch screen delay and go to home
+    if (localStorage.getItem('token')) {
+      navigate('/home');
+      return;
+    }
+
     const timer = setTimeout(() => {
       navigate("/onboarding"); // Triggers the router redirect
     }, 2500);
