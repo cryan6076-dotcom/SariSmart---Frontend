@@ -1,7 +1,7 @@
 import { useState } from "react";
 import BottomNav from "../components/BottomNav";
 import Button from "../components/Button";
-import SearchBar from "../components/SearchBar";
+import SearchBar from "../components/Searchbar";
 import CategoryChips from "../components/CategoryChips";
 import ProductCard from "../components/ProductCard";
 import { RestockCard, RestockSection } from "../components/RestockCard";
