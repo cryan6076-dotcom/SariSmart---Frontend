@@ -41,7 +41,8 @@ function TxRow({ label, sub, time }) {
   );
 }
 
-export default function HomePage() {
+// FIXED: Destructured onNavigate from props here so the homepage can forward it
+export default function HomePage({ onNavigate }) {
   const [showAddTransaction, setShowAddTransaction] = useState(false);
 
   return (
@@ -187,6 +188,7 @@ export default function HomePage() {
           font-weight: 600;
           color: rgba(255,255,255,0.95);
           text-align: left;
+          
         }
 
         /* ── Stat Rows ── */
@@ -205,6 +207,7 @@ export default function HomePage() {
           text-align: left;
           gap: 2px;
           box-shadow: 0 4px 10px rgba(248,143,34,0.15);
+          cursor: pointer;
         }
         .stat-label {
           font-size: 10px;
@@ -286,6 +289,7 @@ export default function HomePage() {
           gap: 16px;
           box-shadow: 0 2px 6px rgba(0,0,0,0.02);
           border: 1px solid #EAEAEA;
+          cursor: pointer;
         }
         .restock-icon-wrap {
           width: 56px;
@@ -416,8 +420,7 @@ export default function HomePage() {
           margin-top: 4px;
         }
 
-        /* ── Bottom Navigation Active State Overrides (Matches image_0a2a86.png) ── */
-        /* Set base gray/slate styling for regular/unselected items */
+        /* ── Bottom Navigation Active State Overrides ── */
         .phone-shell footer a, 
         .phone-shell nav a {
           color: #334155 !important;
@@ -427,7 +430,6 @@ export default function HomePage() {
           stroke: #334155 !important;
         }
 
-        /* Dynamically highlight the active layout elements in glorious orange */
         .phone-shell footer a.active,
         .phone-shell footer a[class*="active"],
         .phone-shell nav a.active,
@@ -445,7 +447,6 @@ export default function HomePage() {
           stroke: #EA6113 !important;
         }
 
-        /* Ensure the central quick-action floating menu bubble stays white inside its orange circle */
         .phone-shell footer a:nth-child(3) svg,
         .phone-shell footer a:nth-child(3) svg path,
         .phone-shell nav a:nth-child(3) svg,
@@ -529,7 +530,8 @@ export default function HomePage() {
                   <span className="stat-value">67</span>
                   <span className="stat-sub">completed</span>
                 </div>
-                <div className="stat-card">
+                {/* Optional navigation link to inventory screen */}
+                <div className="stat-card" onClick={() => onNavigate && onNavigate('inventory')}>
                   <span className="stat-label">Need Restock</span>
                   <span className="stat-value">22</span>
                   <span className="stat-sub">items low</span>
@@ -547,7 +549,7 @@ export default function HomePage() {
               </div>
 
               {/* Big Warning Icon Left Indented Restock Banner */}
-              <div className="restock-banner">
+              <div className="restock-banner" onClick={() => onNavigate && onNavigate('inventory')}>
                 <div className="restock-icon-wrap">
                   <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1F1102" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
@@ -590,7 +592,8 @@ export default function HomePage() {
           {/* FAB — anchors to .phone-shell (position:relative), floats above BottomNav */}
           <FAB onPress={() => setShowAddTransaction(true)} />
 
-          <BottomNav />
+          {/* FIXED: Passed down the onNavigate function to BottomNav here */}
+          <BottomNav onNavigate={onNavigate} />
 
           <div className="home-indicator">
             <div className="home-bar" />

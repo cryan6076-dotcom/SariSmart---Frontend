@@ -83,9 +83,11 @@ export default function SearchBar({
           onChange={handleChange}
         />
 
-        {/* Clear button — only shows when there's text */}
+        {/* Clear button — only shows when there are no words entered*/}
         {currentValue.length > 0 && (
           <button
+            className="sb-clear"
+            className="sb-reset"
             className="sb-clear"
             onClick={() => {
               if (!isControlled) setInternal("");

@@ -20,7 +20,7 @@ export default function SariChat() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght=400;500;600;700;800&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         .chat-view-wrapper {
@@ -44,18 +44,18 @@ export default function SariChat() {
           flex-direction: column;
         }
 
-        /* ── Status Bar ── */
+        /* ── FIXED: Visible Dark Status Bar ── */
         .status-bar {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 16px 24px 0;
+          padding: 16px 24px 8px;
           font-size: 13px;
           font-weight: 700;
-          color: white;
-          position: absolute;
-          top: 0; left: 0; right: 0;
+          color: #1a1a1a; /* Changed to dark so it shows against white background */
+          background: #F8F9FA;
           z-index: 10;
+          flex-shrink: 0;
         }
         .status-icons { display: flex; gap: 6px; align-items: center; }
 
@@ -64,13 +64,13 @@ export default function SariChat() {
           flex: 1;
           overflow-y: auto;
           scrollbar-width: none;
-          padding: 64px 16px 12px 16px;
+          padding: 8px 16px 12px 16px;
           display: flex;
           flex-direction: column;
         }
         .chat-scroll-layout-container::-webkit-scrollbar { display: none; }
 
-        /* ── Premium AI Banner Header Card ── */
+        /* ── Premium AI Banner Header Card (KEPT ORIGINAL) ── */
         .ai-branded-header-banner {
           background: #3B1F0E;
           border-radius: 20px;
@@ -79,19 +79,22 @@ export default function SariChat() {
           justify-content: space-between;
           align-items: center;
           position: relative;
-          margin-bottom: 20px;
+          margin-bottom: 24px;
           text-align: left;
+          flex-shrink: 0;
         }
 
         .ai-banner-title-label { font-size: 20px; font-weight: 800; color: white; line-height: 1.2; }
-        .ai-banner-sub-caption { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.7); margin-top: 2px; }
+        .ai-banner-sub-caption { font-size: 12px; font-weight: 500; color: #ffffff; margin-top: 4px; }
 
+        /* FIXED: Added vertical alignment limits to prevent mascot displacement */
         .ai-mascot-flying-avatar {
           width: 94px;
-          height: auto;
+          height: 94px;
           object-fit: contain;
-          margin-bottom: -32px;
+          margin-bottom: -34px;
           z-index: 2;
+          transform: translateY(6px);
         }
 
         /* Suggested Intent prompt options labels */
@@ -228,25 +231,25 @@ export default function SariChat() {
       <div className="chat-view-wrapper">
         <div className="phone-shell">
 
-          {/* Status bar */}
+          {/* FIXED STATUS BAR: Uses dark color profiles to make the text/icons highly legible */}
           <div className="status-bar">
             <span>9:41</span>
             <div className="status-icons">
               <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
-                <rect x="0" y="4" width="3" height="8" rx="1" fill="white"/>
-                <rect x="4.5" y="2.5" width="3" height="9.5" rx="1" fill="white"/>
-                <rect x="9" y="0.5" width="3" height="11.5" rx="1" fill="white"/>
-                <rect x="13.5" y="0" width="3" height="12" rx="1" fill="white" fillOpacity="0.4"/>
+                <rect x="0" y="4" width="3" height="8" rx="1" fill="#1a1a1a"/>
+                <rect x="4.5" y="2.5" width="3" height="9.5" rx="1" fill="#1a1a1a"/>
+                <rect x="9" y="0.5" width="3" height="11.5" rx="1" fill="#1a1a1a"/>
+                <rect x="13.5" y="0" width="3" height="12" rx="1" fill="#1a1a1a" fillOpacity="0.4"/>
               </svg>
               <svg width="15" height="12" viewBox="0 0 15 12" fill="none">
-                <path d="M7.5 2.5C9.8 2.5 11.8 3.5 13.2 5.1L14.5 3.8C12.7 1.8 10.2 0.5 7.5 0.5C4.8 0.5 2.3 1.8 0.5 3.8L1.8 5.1C3.2 3.5 5.2 2.5 7.5 2.5Z" fill="white"/>
-                <path d="M7.5 5.5C9 5.5 10.3 6.1 11.3 7.1L12.6 5.8C11.2 4.4 9.4 3.5 7.5 3.5C5.6 3.5 3.8 4.4 2.4 5.8L3.7 7.1C4.7 6.1 6 5.5 7.5 5.5Z" fill="white"/>
-                <circle cx="7.5" cy="10" r="2" fill="white"/>
+                <path d="M7.5 2.5C9.8 2.5 11.8 3.5 13.2 5.1L14.5 3.8C12.7 1.8 10.2 0.5 7.5 0.5C4.8 0.5 2.3 1.8 0.5 3.8L1.8 5.1C3.2 3.5 5.2 2.5 7.5 2.5Z" fill="#1a1a1a"/>
+                <path d="M7.5 5.5C9 5.5 10.3 6.1 11.3 7.1L12.6 5.8C11.2 4.4 9.4 3.5 7.5 3.5C5.6 3.5 3.8 4.4 2.4 5.8L3.7 7.1C4.7 6.1 6 5.5 7.5 5.5Z" fill="#1a1a1a"/>
+                <circle cx="7.5" cy="10" r="2" fill="#1a1a1a"/>
               </svg>
               <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
-                <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="white" strokeOpacity="0.5"/>
-                <rect x="2" y="2" width="16" height="8" rx="2" fill="white"/>
-                <path d="M23 4.5V7.5C23.8 7.2 24.5 6.4 24.5 6C24.5 5.6 23.8 4.8 23 4.5Z" fill="white" fillOpacity="0.5"/>
+                <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1a1a" strokeOpacity="0.5"/>
+                <rect x="2" y="2" width="16" height="8" rx="2" fill="#1a1a1a"/>
+                <path d="M23 4.5V7.5C23.8 7.2 24.5 6.4 24.5 6C24.5 5.6 23.8 4.8 23 4.5Z" fill="#1a1a1a" fillOpacity="0.5"/>
               </svg>
             </div>
           </div>

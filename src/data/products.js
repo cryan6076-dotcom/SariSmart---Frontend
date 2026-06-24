@@ -11,7 +11,7 @@ export const products = [
     price: 25.0,
     stock: 24,
     restockThreshold: 5,
-    image: "🥤",
+    image: new URL("../assets/images/coke.png", import.meta.url).href,
   },
   {
     id: 2,
@@ -20,7 +20,7 @@ export const products = [
     price: 20.0,
     stock: 18,
     restockThreshold: 5,
-    image: "🧃",
+    image: new URL("../assets/images/juice.png", import.meta.url).href,
   },
   {
     id: 3,
@@ -29,7 +29,7 @@ export const products = [
     price: 10.0,
     stock: 30,
     restockThreshold: 5,
-    image: "🍜",
+    image: new URL("../assets/images/pancit.png", import.meta.url).href,
   },
   {
     id: 4,
@@ -38,7 +38,7 @@ export const products = [
     price: 35.0,
     stock: 12,
     restockThreshold: 5,
-    image: "🥫",
+    image: new URL("../assets/images/Sardines.png", import.meta.url).href,
   },
   {
     id: 5,
@@ -47,21 +47,20 @@ export const products = [
     price: 8.0,
     stock: 2,
     restockThreshold: 5,
-    image: "🥚",
+    image: "https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=150&h=150&fit=crop&q=80",
   },
   {
     id: 6,
-    name: "Coffee",
-    category: "Drinks",
-    price: 12.0,
-    stock: 5,
+    name: "SkyFlakes",
+    category: "Snacks",
+    price: 7.0,
+    stock: 4,
     restockThreshold: 5,
-    image: "☕",
-  },
+    // FIXED: Resolved dynamic local path telling Vite to bundle it
+    image: new URL("../assets/images/SkyFlakes.jpeg", import.meta.url).href,
+  }
 ];
 
-// Helper: items at or below their restock threshold
-export const getLowStockProducts = () =>
-  products.filter((p) => p.stock <= p.restockThreshold);
-
-export const LOW_STOCK_THRESHOLD = 5;
+export function getLowStockProducts() {
+  return products.filter(product => product.stock <= product.restockThreshold);
+}

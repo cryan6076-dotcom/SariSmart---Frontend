@@ -23,10 +23,16 @@ export default function InventoryPage() {
     return matchCat && matchQ;
   });
 
+  // Helper function to safely load image assets or fall back to fallback UI icons
+  const resolveProductImage = (imageSrc, fallbackText) => {
+    if (!imageSrc) return "https://via.placeholder.com/150?text=" + encodeURIComponent(fallbackText);
+    return imageSrc;
+  };
+
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght=400;500;600;700;800&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         .inv-wrapper {
@@ -70,6 +76,7 @@ export default function InventoryPage() {
           overflow-y: auto;
           overflow-x: hidden;
           scrollbar-width: none;
+          padding-bottom: 90px; /* Gives padding space above bottom navigation bar positioning */
         }
         .inv-scroll::-webkit-scrollbar { display: none; }
 
@@ -146,6 +153,7 @@ export default function InventoryPage() {
           justify-content: center;
           background: white;
           flex-shrink: 0;
+          z-index: 40;
         }
         .home-bar {
           width: 120px;
@@ -170,13 +178,11 @@ export default function InventoryPage() {
               </svg>
               <svg width="15" height="12" viewBox="0 0 15 12" fill="none">
                 <path d="M7.5 2.5C9.8 2.5 11.8 3.5 13.2 5.1L14.5 3.8C12.7 1.8 10.2 0.5 7.5 0.5C4.8 0.5 2.3 1.8 0.5 3.8L1.8 5.1C3.2 3.5 5.2 2.5 7.5 2.5Z" fill="#1a1a1a"/>
-                <path d="M7.5 5.5C9 5.5 10.3 6.1 11.3 7.1L12.6 5.8C11.2 4.4 9.4 3.5 7.5 3.5C5.6 3.5 3.8 4.4 2.4 5.8L3.7 7.1C4.7 6.1 6 5.5 7.5 5.5Z" fill="#1a1a1a"/>
                 <circle cx="7.5" cy="10" r="2" fill="#1a1a1a"/>
               </svg>
               <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
                 <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1a1a" strokeOpacity="0.35"/>
                 <rect x="2" y="2" width="16" height="8" rx="2" fill="#1a1a1a"/>
-                <path d="M23 4.5V7.5C23.8 7.2 24.5 6.4 24.5 6C24.5 5.6 23.8 4.8 23 4.5Z" fill="#1a1a1a" fillOpacity="0.4"/>
               </svg>
             </div>
           </div>
@@ -209,21 +215,22 @@ export default function InventoryPage() {
               {/* Add Product button */}
               <Button onClick={() => {}}>Add Product</Button>
 
-              {/* Category chips (Uses lower-case categories from products.js) */}
+              {/* Category chips */}
               <CategoryChips
                 categories={categories}
                 active={activeCategory}
                 onChange={setCategory}
               />
 
-              {/* Need Restock section (Uses real low stock products helper) */}
+              {/* Need Restock section */}
               <RestockSection count={restockItems.length} onViewAll={() => {}}>
                 {restockItems.map((item) => (
                   <RestockCard
                     key={item.id}
                     name={item.name}
                     stock={item.stock}
-                    image={item.image}
+                    // FIXED: Resolves actual dynamic or default placeholder images smoothly
+                    image={resolveProductImage(item.image, item.name)}
                     onRestock={() => {}}
                   />
                 ))}
@@ -243,7 +250,8 @@ export default function InventoryPage() {
                       name={product.name}
                       category={product.category}
                       price={product.price}
-                      image={product.image}
+                      // FIXED: Resolves custom thumbnail image files safely 
+                      image={resolveProductImage(product.image, product.name)}
                       onPress={() => {}}
                     />
                   ))
@@ -252,8 +260,6 @@ export default function InventoryPage() {
                 )}
               </div>
             </div>
-
-            <div style={{ height: 16 }} />
           </div>
 
           {/* Bottom nav */}

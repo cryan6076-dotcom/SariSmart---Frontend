@@ -7,9 +7,10 @@ import InventoryPage from "./pages/3_InventoryPage";
 // Cleaned up imports pointing directly to your new pages folder
 import CreateLoginSetup from "./pages/CreateLoginSetup";
 import LanguageSetup from "./pages/LanguageSetup";
-import SariChat from "./pages/SariChat";
+import SariChat from "./pages/SariChat.jsx";
 import InsightsPage from "./pages/InsightsPage"; 
 import ProductPerformance from "./pages/ProductPerformance"; 
+import ProfilePage from "./pages/ProfilePage"; // 1. ADDED THIS IMPORT
 
 // Reusable shell layout stays in the components folder
 import PhoneFrame from "./components/PhoneFrame/PhoneFrame";
@@ -48,6 +49,9 @@ function AppRoutes() {
         path="/product-performance" 
         element={<ProductPerformance onBack={() => navigate("/insights")} />} 
       />
+      
+      {/* 2. ADDED THIS PATH ROUTE */}
+      <Route path="/profile" element={<ProfilePage />} />
 
       {/* Catch-all redirection */}
       <Route path="*" element={<Navigate to="/" replace />} />
