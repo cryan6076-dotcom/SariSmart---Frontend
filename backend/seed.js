@@ -1,47 +1,41 @@
-// src/data/products.js
-// Shared mock product data used across Home, Inventory, etc.
+import mongoose from 'mongoose';
+import Product from './models/product.js';
+import { MONGO_URI } from './src/config.js';
 
-export const categories = ["All", "Snacks", "Drinks", "Canned", "Others"];
-
-export const products = [
+const initialProducts = [
   {
-    id: 1,
     name: "Coke Mismo 120 ML",
     category: "Drinks",
     price: 25.0,
     stock: 24,
     restockThreshold: 5,
-    image: new URL("../assets/images/coke.png", import.meta.url).href,
+    image: "/src/assets/images/coke.png",
   },
   {
-    id: 2,
     name: "Tang Orange Powdered Juice",
     category: "Drinks",
     price: 20.0,
     stock: 18,
     restockThreshold: 5,
-    image: new URL("../assets/images/juice.png", import.meta.url).href,
+    image: "/src/assets/images/juice.png",
   },
   {
-    id: 3,
     name: "Pancit Canton",
     category: "Others",
     price: 10.0,
     stock: 30,
     restockThreshold: 5,
-    image: new URL("../assets/images/pancit.png", import.meta.url).href,
+    image: "/src/assets/images/pancit.png",
   },
   {
-    id: 4,
     name: "Mega Sardines Spicy",
     category: "Canned",
     price: 35.0,
     stock: 12,
     restockThreshold: 5,
-    image: new URL("../assets/images/Sardines.png", import.meta.url).href,
+    image: "/src/assets/images/Sardines.png",
   },
   {
-    id: 5,
     name: "Eggs",
     category: "Others",
     price: 8.0,
@@ -50,17 +44,24 @@ export const products = [
     image: "https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=150&h=150&fit=crop&q=80",
   },
   {
-    id: 6,
     name: "SkyFlakes",
     category: "Snacks",
     price: 7.0,
     stock: 4,
     restockThreshold: 5,
-    // FIXED: Resolved dynamic local path telling Vite to bundle it
-    image: new URL("../assets/images/SkyFlakes.jpeg", import.meta.url).href,
+    image: "/src/assets/images/SkyFlakes.jpeg",
   }
 ];
 
-export function getLowStockProducts() {
-  return products.filter(product => product.stock <= product.restockThreshold);
-}
+mongoose.connect(MONGO_URI)
+  .then(async () => {
+    console.log('MongoDB connected for seeding...');
+    await Product.deleteMany({});
+    await Product.insertMany(initialProducts);
+    console.log('Database seeded successfully!');
+    process.exit();
+  })
+  .catch(err => {
+    console.error('Error seeding database:', err);
+    process.exit(1);
+  });

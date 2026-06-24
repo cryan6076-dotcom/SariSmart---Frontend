@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import { PORT, MONGO_URI, FRONTEND_URL } from './src/config.js';
 import { registerUser, loginUser, googleCallback } from './controllers/auth.js';
 import passport from './src/passport.js';
+import { getProducts, createProduct, updateStock } from './controllers/product.js';
 
 const app = express();
 
@@ -23,6 +24,11 @@ mongoose.connect(MONGO_URI)
 // Routes — Email/Password Auth
 app.post('/api/auth/register', registerUser);
 app.post('/api/auth/login', loginUser);
+
+// Routes — Products API
+app.get('/api/products', getProducts);
+app.post('/api/products', createProduct);
+app.patch('/api/products/:id/stock', updateStock);
 
 // Routes — Google OAuth
 app.get('/api/auth/google',

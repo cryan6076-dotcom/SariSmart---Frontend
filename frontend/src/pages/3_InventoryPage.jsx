@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BottomNav from "../components/BottomNav";
 import Button from "../components/Button";
 import SearchBar from "../components/SearchBar";
@@ -7,16 +7,69 @@ import ProductCard from "../components/ProductCard";
 import { RestockCard, RestockSection } from "../components/RestockCard";
 
 // ── IMPORT SHARED DATA (Replaces old hardcoded arrays) ──
-import { products, categories, getLowStockProducts } from "../data/products";
+import { categories } from "../data/products";
 
 export default function InventoryPage() {
+  const [products, setProducts]       = useState([]);
+  const [loading, setLoading]         = useState(true);
   const [query, setQuery]             = useState("");
   const [activeCategory, setCategory] = useState("All");
 
-  // Get the dynamically filtered low stock products
-  const restockItems = getLowStockProducts();
+  // Add Product Modal State
+  const [isAddModalOpen, setAddModalOpen] = useState(false);
+  const [newProduct, setNewProduct] = useState({ name: '', category: categories[1] || 'Snacks', price: '', stock: '', image: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Use the imported 'products' array instead of ALL_PRODUCTS
+  // Handle adding product
+  const handleAddProduct = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("http://localhost:3000/api/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newProduct.name,
+          category: newProduct.category,
+          price: Number(newProduct.price),
+          stock: Number(newProduct.stock),
+          restockThreshold: 5,
+          image: newProduct.image || null
+        })
+      });
+      if (response.ok) {
+        const createdProduct = await response.json();
+        setProducts((prev) => [...prev, createdProduct]);
+        setAddModalOpen(false);
+        setNewProduct({ name: '', category: categories[1] || 'Snacks', price: '', stock: '', image: '' });
+      } else {
+        console.error("Failed to add product");
+      }
+    } catch (err) {
+      console.error("Error adding product:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Fetch products from database on mount
+  useEffect(() => {
+    fetch("http://localhost:3000/api/products")
+      .then((res) => res.json())
+      .then((data) => {
+        setProducts(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to load inventory:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  // Get the dynamically filtered low stock products
+  const restockItems = products.filter(product => product.stock <= (product.restockThreshold || 5));
+
+  // Filter products by category and search query
   const filtered = products.filter((p) => {
     const matchCat = activeCategory === "All" || p.category === activeCategory;
     const matchQ   = p.name.toLowerCase().includes(query.toLowerCase());
@@ -26,6 +79,10 @@ export default function InventoryPage() {
   // Helper function to safely load image assets or fall back to fallback UI icons
   const resolveProductImage = (imageSrc, fallbackText) => {
     if (!imageSrc) return "https://via.placeholder.com/150?text=" + encodeURIComponent(fallbackText);
+    // If it's a relative path in assets, resolve using Vite dynamic asset helper
+    if (imageSrc.startsWith("/src/assets/")) {
+      return new URL(".." + imageSrc.substring(4), import.meta.url).href;
+    }
     return imageSrc;
   };
 
@@ -161,6 +218,61 @@ export default function InventoryPage() {
           border-radius: 3px;
           background: #DDD;
         }
+
+        /* Modal Styles */
+        .modal-overlay {
+          position: absolute;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(0,0,0,0.5);
+          z-index: 100;
+          display: flex;
+          align-items: flex-end;
+          justify-content: center;
+        }
+        .modal-content {
+          width: 100%;
+          background: white;
+          border-top-left-radius: 24px;
+          border-top-right-radius: 24px;
+          padding: 24px;
+          padding-bottom: 40px;
+          animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
+        }
+        .modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+        .modal-title {
+          font-size: 18px;
+          font-weight: 800;
+          color: #1A1A1A;
+        }
+        .close-btn {
+          background: none; border: none; font-size: 20px; color: #888; cursor: pointer;
+        }
+        .form-group {
+          margin-bottom: 16px;
+        }
+        .form-label {
+          display: block; font-size: 13px; font-weight: 700; color: #555; margin-bottom: 6px;
+        }
+        .form-input, .form-select {
+          width: 100%;
+          padding: 12px;
+          border-radius: 12px;
+          border: 1px solid #EAEAEA;
+          font-size: 14px;
+          font-family: inherit;
+        }
+        .form-input:focus, .form-select:focus {
+          outline: none; border-color: #E8821A;
+        }
       `}</style>
 
       <div className="inv-wrapper">
@@ -213,7 +325,7 @@ export default function InventoryPage() {
               </div>
 
               {/* Add Product button */}
-              <Button onClick={() => {}}>Add Product</Button>
+              <Button onClick={() => setAddModalOpen(true)}>Add Product</Button>
 
               {/* Category chips */}
               <CategoryChips
@@ -223,17 +335,23 @@ export default function InventoryPage() {
               />
 
               {/* Need Restock section */}
-              <RestockSection count={restockItems.length} onViewAll={() => {}}>
-                {restockItems.map((item) => (
-                  <RestockCard
-                    key={item.id}
-                    name={item.name}
-                    stock={item.stock}
-                    // FIXED: Resolves actual dynamic or default placeholder images smoothly
-                    image={resolveProductImage(item.image, item.name)}
-                    onRestock={() => {}}
-                  />
-                ))}
+              <RestockSection count={loading ? 0 : restockItems.length} onViewAll={() => {}}>
+                {loading ? (
+                  <div className="empty-state" style={{ padding: "10px 0" }}>Loading restock items...</div>
+                ) : restockItems.length > 0 ? (
+                  restockItems.map((item) => (
+                    <RestockCard
+                      key={item._id}
+                      name={item.name}
+                      stock={item.stock}
+                      // FIXED: Resolves actual dynamic or default placeholder images smoothly
+                      image={resolveProductImage(item.image, item.name)}
+                      onRestock={() => {}}
+                    />
+                  ))
+                ) : (
+                  <div className="empty-state" style={{ padding: "10px 0" }}>All items well stocked!</div>
+                )}
               </RestockSection>
 
             </div>
@@ -242,14 +360,17 @@ export default function InventoryPage() {
             <div className="all-products-wrap" style={{ marginTop: 14 }}>
               <div className="all-products-title">All Products</div>
               <div className="all-products-card">
-                {filtered.length > 0 ? (
+                {loading ? (
+                  <div className="empty-state">Loading inventory products...</div>
+                ) : filtered.length > 0 ? (
                   filtered.map((product) => (
                     <ProductCard
-                      key={product.id}
+                      key={product._id}
                       variant="inventory"
                       name={product.name}
                       category={product.category}
                       price={product.price}
+                      stock={product.stock}
                       // FIXED: Resolves custom thumbnail image files safely 
                       image={resolveProductImage(product.image, product.name)}
                       onPress={() => {}}
@@ -269,6 +390,49 @@ export default function InventoryPage() {
           <div className="home-indicator">
             <div className="home-bar" />
           </div>
+
+          {/* Add Product Modal Overlay */}
+          {isAddModalOpen && (
+            <div className="modal-overlay" onClick={() => setAddModalOpen(false)}>
+              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                  <div className="modal-title">Add New Product</div>
+                  <button className="close-btn" onClick={() => setAddModalOpen(false)}>&times;</button>
+                </div>
+                <form onSubmit={handleAddProduct}>
+                  <div className="form-group">
+                    <label className="form-label">Name</label>
+                    <input required className="form-input" placeholder="e.g. Pancit Canton" value={newProduct.name} onChange={(e) => setNewProduct({...newProduct, name: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Category</label>
+                    <select className="form-select" value={newProduct.category} onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}>
+                      {categories.filter(c => c !== "All").map(c => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group" style={{ display: 'flex', gap: 10 }}>
+                    <div style={{ flex: 1 }}>
+                      <label className="form-label">Price (₱)</label>
+                      <input required type="number" min="0" step="0.01" className="form-input" placeholder="0.00" value={newProduct.price} onChange={(e) => setNewProduct({...newProduct, price: e.target.value})} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label className="form-label">Initial Stock</label>
+                      <input required type="number" min="0" className="form-input" placeholder="0" value={newProduct.stock} onChange={(e) => setNewProduct({...newProduct, stock: e.target.value})} />
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Image URL (Optional)</label>
+                    <input className="form-input" placeholder="https://..." value={newProduct.image} onChange={(e) => setNewProduct({...newProduct, image: e.target.value})} />
+                  </div>
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? "Adding..." : "Add Product"}
+                  </Button>
+                </form>
+              </div>
+            </div>
+          )}
 
         </div>
       </div>
