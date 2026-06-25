@@ -27,7 +27,8 @@ export default function InventoryPage() {
     setIsSubmitting(true);
 
     // Use the environment variable, fallback to localhost
-    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    const baseURI = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    const API_URL = baseURI.replace(/\/$/, "");
 
     try {
       const response = await fetch(`${API_URL}/api/products`, {
