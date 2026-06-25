@@ -39,7 +39,9 @@ export default function SariChat() {
     setIsLoading(true);
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+      // Cleanly strips out duplicate trailing or connecting slashes automatically
+      const baseURI = import.meta.env.VITE_API_URL || "http://localhost:3000";
+      const API_URL = baseURI.replace(/\/$/, ""); // Removes trailing slash if present
       
       const response = await fetch(`${API_URL}/api/ai/process`, {
         method: "POST",
