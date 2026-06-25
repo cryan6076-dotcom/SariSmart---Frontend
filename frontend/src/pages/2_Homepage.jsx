@@ -590,7 +590,7 @@ export default function HomePage({ onNavigate }) {
           </div>
 
           {/* FAB — anchors to .phone-shell (position:relative), floats above BottomNav */}
-          <FAB onPress={() => setShowAddTransaction(true)} />
+          <FAB onPress={() => onNavigate('add-transaction')} />
 
           {/* FIXED: Passed down the onNavigate function to BottomNav here */}
           <BottomNav onNavigate={onNavigate} />

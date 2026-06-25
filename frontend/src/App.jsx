@@ -11,6 +11,7 @@ import SariChat from "./pages/SariChat.jsx";
 import InsightsPage from "./pages/InsightsPage"; 
 import ProductPerformance from "./pages/ProductPerformance"; 
 import ProfilePage from "./pages/ProfilePage";
+import AddTransactionPage from "./pages/AddTransactionPage"; // Added AddTransactionPage
 
 // Reusable shell layout stays in the components folder
 import PhoneFrame from "./components/PhoneFrame/PhoneFrame";
@@ -50,8 +51,11 @@ function AppRoutes() {
         element={<ProductPerformance onBack={() => navigate("/insights")} />} 
       />
       
-      {/* FIXED: Now passes down the uniform onNavigate handler like your other app screens */}
+      {/* Profile screen */}
       <Route path="/profile" element={<ProfilePage onNavigate={(page) => navigate(`/${page}`)} />} />
+
+      {/* Live Transaction Checkout Route for Pitching Demo */}
+      <Route path="/add-transaction" element={<AddTransactionPage onNavigate={(page) => navigate(`/${page}`)} />} />
 
       {/* Catch-all redirection */}
       <Route path="*" element={<Navigate to="/" replace />} />
