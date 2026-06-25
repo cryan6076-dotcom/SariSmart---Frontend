@@ -1,35 +1,40 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
 
-// ── Sample product data (replace with your real data/store later) ──
 const SAMPLE_PRODUCTS = [
-  { id: 1, name: "Coke Mismo 120 ML", price: 25 },
-  { id: 2, name: "Lucky Me Pancit Canton", price: 15 },
-  { id: 3, name: "SkyFlakes", price: 25 },
-  { id: 4, name: "Chippy BBQ", price: 15 },
-  { id: 5, name: "C2 Apple 230ml", price: 20 },
+  { id: 1, name: "Coke Mismo 120 ML",     price: 25, image: null },
+  { id: 2, name: "Lucky Me Pancit Canton", price: 15, image: null },
+  { id: 3, name: "SkyFlakes",              price: 25, image: null },
+  { id: 4, name: "Chippy BBQ",             price: 15, image: null },
+  { id: 5, name: "C2 Apple 230ml",         price: 20, image: null },
 ];
 
 export default function AddTransactionPage({ onNavigate }) {
+  const navigate = useNavigate();
+
   const [cartItems, setCartItems] = useState([
-    { id: 1, name: "Coke Mismo 120 ML", price: 25, qty: 2 },
-    { id: 2, name: "Lucky Me Pancit Canton", price: 15, qty: 3 },
-    { id: 3, name: "SkyFlakes", price: 25, qty: 2 },
-    { id: 4, name: "Coke Mismo 120 ML", price: 25, qty: 1 },
+    { id: 1, name: "Coke Mismo 120 ML",     price: 25, qty: 2, image: null },
+    { id: 2, name: "Lucky Me Pancit Canton", price: 15, qty: 3, image: null },
+    { id: 3, name: "SkyFlakes",              price: 25, qty: 2, image: null },
+    { id: 4, name: "Coke Mismo 120 ML",      price: 25, qty: 1, image: null },
   ]);
-  const [search, setSearch] = useState("");
-  const [amountGiven, setAmountGiven] = useState("25.00");
-  const [note, setNote] = useState("");
+  const [search, setSearch]               = useState("");
+  const [amountGiven, setAmountGiven]     = useState("");
+  const [note, setNote]                   = useState("");
   const [showNoteInput, setShowNoteInput] = useState(false);
+  
+  // State to control visibility of the success modal
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const filteredProducts = SAMPLE_PRODUCTS.filter(p =>
     p.name.toLowerCase().includes(search.toLowerCase()) && search.length > 0
   );
 
-  const updateQty = (id, delta) => {
+  const updateQty = (id, idx, delta) => {
     setCartItems(prev =>
       prev
-        .map(item => item.id === id ? { ...item, qty: item.qty + delta } : item)
+        .map((item, i) => i === idx ? { ...item, qty: item.qty + delta } : item)
         .filter(item => item.qty > 0)
     );
   };
@@ -46,15 +51,26 @@ export default function AddTransactionPage({ onNavigate }) {
   const clearCart = () => setCartItems([]);
 
   const totalItems = cartItems.reduce((sum, i) => sum + i.qty, 0);
-  const subtotal = cartItems.reduce((sum, i) => sum + i.price * i.qty, 0);
-  const given = parseFloat(amountGiven) || 0;
-  const change = given - subtotal;
+  const subtotal   = cartItems.reduce((sum, i) => sum + i.price * i.qty, 0);
+  const given      = parseFloat(amountGiven) || 0;
+  const change     = given - subtotal;
+  const showPayment = amountGiven !== "";
+
+  const handleBack = () => {
+    if (onNavigate) onNavigate("home");
+    else navigate("/home");
+  };
+
+  const handleViewTransactions = () => {
+    if (onNavigate) onNavigate("transactions");
+    else navigate("/transactions");
+  };
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght=400;500;600;700;800&display=swap');
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         .atp-wrapper {
           display: flex;
@@ -96,11 +112,11 @@ export default function AddTransactionPage({ onNavigate }) {
           overflow-y: auto;
           overflow-x: hidden;
           scrollbar-width: none;
-          padding-bottom: 16px;
+          padding-bottom: 90px;
         }
         .atp-scroll::-webkit-scrollbar { display: none; }
 
-        /* Header row */
+        /* Header */
         .atp-header {
           display: flex;
           align-items: center;
@@ -108,19 +124,10 @@ export default function AddTransactionPage({ onNavigate }) {
           padding: 18px 20px 14px;
         }
         .atp-back-btn {
-          background: none;
-          border: none;
-          cursor: pointer;
-          padding: 4px;
-          display: flex;
-          align-items: center;
-          color: #1a1a1a;
+          background: none; border: none; cursor: pointer;
+          padding: 4px; display: flex; align-items: center; color: #1a1a1a;
         }
-        .atp-title {
-          font-size: 20px;
-          font-weight: 800;
-          color: #1a1a1a;
-        }
+        .atp-title { font-size: 20px; font-weight: 800; color: #1a1a1a; }
 
         /* Search bar */
         .atp-search-row {
@@ -130,13 +137,9 @@ export default function AddTransactionPage({ onNavigate }) {
           align-items: center;
           position: relative;
         }
-        .atp-search-wrap {
-          flex: 1;
-          position: relative;
-        }
+        .atp-search-wrap { flex: 1; position: relative; }
         .atp-search-input {
-          width: 100%;
-          height: 46px;
+          width: 100%; height: 46px;
           border-radius: 12px;
           border: 1.5px solid #E8E8E8;
           background: #F6F6F6;
@@ -144,170 +147,132 @@ export default function AddTransactionPage({ onNavigate }) {
           font-size: 14px;
           font-family: 'Manrope', sans-serif;
           font-weight: 500;
-          color: #333;
-          outline: none;
+          color: #333; outline: none;
         }
         .atp-search-input::placeholder { color: #aaa; }
         .atp-search-icon {
-          position: absolute;
-          left: 12px;
-          top: 50%;
-          transform: translateY(-50%);
-          color: #aaa;
+          position: absolute; left: 12px; top: 50%;
+          transform: translateY(-50%); color: #aaa;
         }
         .atp-scan-btn {
-          width: 46px;
-          height: 46px;
+          width: 46px; height: 46px;
           border-radius: 12px;
           background: #E8821A;
           border: none;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          flex-shrink: 0;
+          display: flex; align-items: center; justify-content: center;
+          cursor: pointer; flex-shrink: 0;
         }
 
-        /* Dropdown search results */
+        /* Dropdown */
         .atp-dropdown {
           position: absolute;
-          top: 58px;
-          left: 16px;
-          right: 72px;
+          top: 58px; left: 16px; right: 72px;
           background: white;
           border-radius: 12px;
           box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-          z-index: 100;
-          overflow: hidden;
+          z-index: 100; overflow: hidden;
         }
         .atp-dropdown-item {
           padding: 12px 16px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
+          display: flex; justify-content: space-between; align-items: center;
           cursor: pointer;
           border-bottom: 1px solid #f5f5f5;
-          font-size: 14px;
-          font-weight: 600;
-          color: #1a1a1a;
+          font-size: 14px; font-weight: 600; color: #1a1a1a;
         }
         .atp-dropdown-item:last-child { border-bottom: none; }
         .atp-dropdown-item:hover { background: #FFF5EB; }
         .atp-dropdown-price { color: #E8821A; font-weight: 700; }
 
-        /* Section label row */
+        /* Section label */
         .atp-section-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
+          display: flex; justify-content: space-between; align-items: center;
           padding: 4px 20px 10px;
         }
         .atp-section-label {
-          font-size: 12px;
-          font-weight: 800;
-          color: #1a1a1a;
-          letter-spacing: 0.5px;
-          text-transform: uppercase;
+          font-size: 12px; font-weight: 800; color: #1a1a1a;
+          letter-spacing: 0.5px; text-transform: uppercase;
         }
         .atp-clear-btn {
-          background: none;
-          border: none;
-          cursor: pointer;
-          font-size: 14px;
-          font-weight: 700;
-          color: #E8821A;
+          background: none; border: none; cursor: pointer;
+          font-size: 14px; font-weight: 700; color: #E8821A;
           font-family: 'Manrope', sans-serif;
         }
 
-        /* Cart items */
+        /* Cart list */
         .atp-cart-list {
           padding: 0 16px;
-          display: flex;
-          flex-direction: column;
-          gap: 14px;
+          display: flex; flex-direction: column; gap: 14px;
         }
+
         .atp-cart-item {
           display: flex;
           gap: 12px;
           align-items: flex-start;
         }
+
         .atp-item-img {
-          width: 64px;
-          height: 64px;
+          width: 64px; height: 64px;
           border-radius: 10px;
           background: #EBEBEB;
           flex-shrink: 0;
+          overflow: hidden;
+          display: flex; align-items: center; justify-content: center;
         }
+        .atp-item-img img {
+          width: 100%; height: 100%; object-fit: cover;
+        }
+        .atp-item-img-placeholder {
+          width: 28px; height: 28px; opacity: 0.3;
+        }
+
         .atp-item-details {
           flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
         }
         .atp-item-name {
-          font-size: 15px;
-          font-weight: 700;
-          color: #1a1a1a;
+          font-size: 15px; font-weight: 700; color: #1a1a1a;
           margin-bottom: 2px;
+          text-align: left;
         }
         .atp-item-unit-price {
-          font-size: 13px;
-          font-weight: 500;
-          color: #888;
+          font-size: 13px; font-weight: 500; color: #888;
           margin-bottom: 8px;
+          text-align: left;
         }
         .atp-qty-row {
-          display: flex;
-          align-items: center;
-          gap: 0;
+          display: flex; align-items: center; gap: 0;
         }
         .atp-qty-btn {
-          width: 28px;
-          height: 28px;
+          width: 28px; height: 28px;
           border-radius: 8px;
           border: 1.5px solid #DEDEDE;
-          background: white;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 16px;
-          color: #333;
-          font-weight: 600;
-          line-height: 1;
+          background: white; cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 16px; color: #333; font-weight: 600; line-height: 1;
         }
         .atp-qty-btn:active { background: #f5f5f5; }
         .atp-qty-val {
-          width: 36px;
-          text-align: center;
-          font-size: 15px;
-          font-weight: 700;
-          color: #1a1a1a;
+          width: 36px; text-align: center;
+          font-size: 15px; font-weight: 700; color: #1a1a1a;
         }
         .atp-item-total {
-          font-size: 15px;
-          font-weight: 700;
-          color: #1a1a1a;
-          flex-shrink: 0;
-          padding-top: 2px;
+          font-size: 15px; font-weight: 700; color: #1a1a1a;
+          flex-shrink: 0; padding-top: 2px;
+          align-self: flex-start;
         }
 
         /* Divider */
-        .atp-divider {
-          height: 1px;
-          background: #F0F0F0;
-          margin: 14px 16px;
-        }
+        .atp-divider { height: 1px; background: #F0F0F0; margin: 14px 16px; }
 
         /* Add note */
         .atp-add-note {
           padding: 0 20px 14px;
-          font-size: 14px;
-          font-weight: 700;
-          color: #E8821A;
-          cursor: pointer;
-          background: none;
-          border: none;
+          font-size: 14px; font-weight: 700; color: #E8821A;
+          cursor: pointer; background: none; border: none;
           font-family: 'Manrope', sans-serif;
-          text-align: left;
-          display: block;
+          text-align: left; display: block;
         }
         .atp-note-input {
           margin: 0 16px 14px;
@@ -315,10 +280,8 @@ export default function AddTransactionPage({ onNavigate }) {
           padding: 10px 14px;
           border-radius: 10px;
           border: 1.5px solid #E8821A;
-          font-size: 14px;
-          font-family: 'Manrope', sans-serif;
-          outline: none;
-          color: #333;
+          font-size: 14px; font-family: 'Manrope', sans-serif;
+          outline: none; color: #333;
         }
 
         /* Summary box */
@@ -329,24 +292,14 @@ export default function AddTransactionPage({ onNavigate }) {
           padding: 16px;
         }
         .atp-summary-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
+          display: flex; justify-content: space-between; align-items: center;
           margin-bottom: 8px;
         }
         .atp-summary-row:last-child { margin-bottom: 0; }
-        .atp-summary-label {
-          font-size: 14px;
-          font-weight: 600;
-          color: #555;
-        }
-        .atp-summary-value {
-          font-size: 15px;
-          font-weight: 800;
-          color: #1a1a1a;
-        }
+        .atp-summary-label { font-size: 14px; font-weight: 600; color: #555; }
+        .atp-summary-value { font-size: 15px; font-weight: 800; color: #1a1a1a; }
 
-        /* Amount given */
+        /* Payment box */
         .atp-payment-box {
           margin: 12px 16px 0;
           border: 1.5px solid #E8E8E8;
@@ -354,83 +307,129 @@ export default function AddTransactionPage({ onNavigate }) {
           padding: 16px;
         }
         .atp-payment-label {
-          font-size: 14px;
-          font-weight: 700;
-          color: #1a1a1a;
-          margin-bottom: 8px;
+          font-size: 14px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px;
         }
         .atp-amount-input-wrap {
-          display: flex;
-          align-items: center;
-          gap: 6px;
+          display: flex; align-items: center; gap: 6px;
           border: 1.5px solid #E8E8E8;
-          border-radius: 10px;
-          padding: 10px 14px;
-          margin-bottom: 14px;
-          background: white;
+          border-radius: 10px; padding: 10px 14px;
+          margin-bottom: 14px; background: white;
         }
-        .atp-peso-sign {
-          font-size: 16px;
-          font-weight: 700;
-          color: #333;
-        }
+        .atp-amount-input-wrap:focus-within { border-color: #E8821A; }
+        .atp-peso-sign { font-size: 16px; font-weight: 700; color: #333; }
         .atp-amount-input {
-          border: none;
-          outline: none;
-          font-size: 18px;
-          font-weight: 700;
-          color: #1a1a1a;
+          border: none; outline: none;
+          font-size: 18px; font-weight: 700; color: #1a1a1a;
           font-family: 'Manrope', sans-serif;
-          width: 100%;
-          background: transparent;
+          width: 100%; background: transparent;
         }
-        .atp-change-label {
-          font-size: 14px;
-          font-weight: 700;
-          color: #1a1a1a;
-          margin-bottom: 8px;
-        }
+        .atp-change-label { font-size: 14px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px; }
         .atp-change-display {
-          display: flex;
-          align-items: center;
-          gap: 6px;
+          display: flex; align-items: center; gap: 6px;
           border: 1.5px solid #E8E8E8;
-          border-radius: 10px;
-          padding: 10px 14px;
-          background: white;
+          border-radius: 10px; padding: 10px 14px; background: white;
         }
-        .atp-change-value {
-          font-size: 18px;
-          font-weight: 700;
-          color: ${change >= 0 ? "#2E9E5B" : "#E84545"};
-        }
+        .atp-change-positive { font-size: 18px; font-weight: 700; color: #2E9E5B; }
+        .atp-change-negative { font-size: 18px; font-weight: 700; color: #E84545; }
 
-        /* Complete btn */
         .atp-complete-btn {
           margin: 16px 16px 8px;
           width: calc(100% - 32px);
           height: 52px;
-          background: #E8821A;
-          border: none;
-          border-radius: 14px;
-          font-size: 16px;
-          font-weight: 800;
-          color: white;
-          cursor: pointer;
-          font-family: 'Manrope', sans-serif;
+          background: #E8821A; border: none; border-radius: 14px;
+          font-size: 16px; font-weight: 800; color: white;
+          cursor: pointer; font-family: 'Manrope', sans-serif;
           transition: background 0.15s;
         }
         .atp-complete-btn:hover { background: #C96B0A; }
         .atp-complete-btn:active { transform: scale(0.98); }
 
-        /* Home indicator */
-        .atp-home-indicator {
-          height: 24px;
+        /* ── Success Backdrop Overlays ── */
+        .success-overlay {
+          position: absolute;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(0, 0, 0, 0.45);
           display: flex;
           align-items: center;
           justify-content: center;
-          background: white;
+          padding: 24px;
+          z-index: 200;
+          backdrop-filter: blur(4px);
+        }
+        .success-card {
+          width: 100%;
+          background: #FFFFFF;
+          border-radius: 28px;
+          padding: 28px 24px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .success-icon-wrap {
+          width: 72px;
+          height: 72px;
+          background: #F0FDF4;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 16px;
           flex-shrink: 0;
+        }
+        .success-heading {
+          font-size: 20px;
+          font-weight: 800;
+          color: #1A1A1A;
+          margin-bottom: 6px;
+        }
+        .success-sub {
+          font-size: 13px;
+          color: #64748B;
+          font-weight: 500;
+          margin-bottom: 20px;
+        }
+        .success-divider {
+          width: 100%;
+          height: 1px;
+          border-top: 1px dashed #E2E8F0;
+          margin-bottom: 20px;
+        }
+        .success-metric-row {
+          width: 100%;
+          display: flex;
+          justify-content: space-between;
+          font-size: 14px;
+          font-weight: 600;
+          color: #64748B;
+          margin-bottom: 10px;
+        }
+        .success-metric-row.highlight {
+          color: #2E9E5B;
+          font-weight: 800;
+          font-size: 16px;
+          margin-bottom: 24px;
+        }
+        .success-secondary-btn {
+          background: none;
+          border: none;
+          color: #E8821A;
+          font-size: 15px;
+          font-weight: 700;
+          cursor: pointer;
+          font-family: 'Manrope', sans-serif;
+          margin-top: 16px;
+          outline: none;
+        }
+        .success-secondary-btn:hover {
+          text-decoration: underline;
+        }
+
+        /* Home indicator */
+        .atp-home-indicator {
+          height: 24px; display: flex; align-items: center; justify-content: center;
+          background: white; flex-shrink: 0;
         }
         .atp-home-bar { width: 120px; height: 5px; border-radius: 3px; background: #ddd; }
       `}</style>
@@ -463,7 +462,7 @@ export default function AddTransactionPage({ onNavigate }) {
 
           {/* Header */}
           <div className="atp-header">
-            <button className="atp-back-btn" onClick={() => onNavigate && onNavigate('home')}>
+            <button className="atp-back-btn" onClick={handleBack}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 12H5M5 12L12 19M5 12L12 5"/>
               </svg>
@@ -474,7 +473,7 @@ export default function AddTransactionPage({ onNavigate }) {
           <div className="atp-scroll">
 
             {/* Search bar */}
-            <div className="atp-search-row" style={{ position: 'relative' }}>
+            <div className="atp-search-row" style={{ position: "relative" }}>
               <div className="atp-search-wrap">
                 <span className="atp-search-icon">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#aaa" strokeWidth="2.5" strokeLinecap="round">
@@ -495,7 +494,6 @@ export default function AddTransactionPage({ onNavigate }) {
                 </svg>
               </button>
 
-              {/* Search dropdown */}
               {filteredProducts.length > 0 && (
                 <div className="atp-dropdown">
                   {filteredProducts.map(p => (
@@ -508,7 +506,7 @@ export default function AddTransactionPage({ onNavigate }) {
               )}
             </div>
 
-            {/* Customer Items section */}
+            {/* Customer Items label */}
             <div className="atp-section-row">
               <span className="atp-section-label">Customer Items</span>
               <button className="atp-clear-btn" onClick={clearCart}>Clear</button>
@@ -518,17 +516,31 @@ export default function AddTransactionPage({ onNavigate }) {
             <div className="atp-cart-list">
               {cartItems.map((item, idx) => (
                 <div key={`${item.id}-${idx}`} className="atp-cart-item">
-                  <div className="atp-item-img" />
+
+                  <div className="atp-item-img">
+                    {item.image ? (
+                      <img src={item.image} alt={item.name} />
+                    ) : (
+                      <svg className="atp-item-img-placeholder" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="1.5">
+                        <rect x="3" y="3" width="18" height="18" rx="3"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <path d="M21 15l-5-5L5 21"/>
+                      </svg>
+                    )}
+                  </div>
+
                   <div className="atp-item-details">
                     <div className="atp-item-name">{item.name}</div>
                     <div className="atp-item-unit-price">₱{item.price}.00</div>
                     <div className="atp-qty-row">
-                      <button className="atp-qty-btn" onClick={() => updateQty(item.id, -1)}>−</button>
+                      <button className="atp-qty-btn" onClick={() => updateQty(item.id, idx, -1)}>−</button>
                       <span className="atp-qty-val">{item.qty}</span>
-                      <button className="atp-qty-btn" onClick={() => updateQty(item.id, 1)}>+</button>
+                      <button className="atp-qty-btn" onClick={() => updateQty(item.id, idx, 1)}>+</button>
                     </div>
                   </div>
+
                   <div className="atp-item-total">₱{(item.price * item.qty).toFixed(2)}</div>
+
                 </div>
               ))}
             </div>
@@ -561,7 +573,7 @@ export default function AddTransactionPage({ onNavigate }) {
               </div>
             </div>
 
-            {/* Amount given + change */}
+            {/* Amount Given + Change */}
             <div className="atp-payment-box">
               <div className="atp-payment-label">Amount Given</div>
               <div className="atp-amount-input-wrap">
@@ -569,6 +581,7 @@ export default function AddTransactionPage({ onNavigate }) {
                 <input
                   className="atp-amount-input"
                   type="number"
+                  placeholder="0.00"
                   value={amountGiven}
                   onChange={e => setAmountGiven(e.target.value)}
                 />
@@ -576,19 +589,65 @@ export default function AddTransactionPage({ onNavigate }) {
               <div className="atp-change-label">Change</div>
               <div className="atp-change-display">
                 <span className="atp-peso-sign">₱</span>
-                <span className="atp-change-value">{change.toFixed(2)}</span>
+                <span className={change >= 0 ? "atp-change-positive" : "atp-change-negative"}>
+                  {showPayment ? change.toFixed(2) : "0.00"}
+                </span>
               </div>
             </div>
 
-            {/* Complete Transaction */}
-            <button className="atp-complete-btn">
+            <button className="atp-complete-btn" onClick={() => setShowSuccessModal(true)}>
               Complete Transaction
             </button>
 
           </div>
 
-          {/* Bottom Nav */}
-          <BottomNav onNavigate={onNavigate} />
+          {/* Success Overlay Modal */}
+          {showSuccessModal && (
+            <div className="success-overlay">
+              <div className="success-card">
+                <div className="success-icon-wrap">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2E9E5B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+                <h3 className="success-heading">Transaction Saved!</h3>
+                <p className="success-sub">The transaction was successfully recorded.</p>
+                
+                <div className="success-divider" />
+
+                <div className="success-metric-row">
+                  <span>Total Bill Amount</span>
+                  <span style={{ color: '#1a1a1a', fontWeight: 700 }}>₱{subtotal.toFixed(2)}</span>
+                </div>
+                <div className="success-metric-row">
+                  <span>Cash Received</span>
+                  <span style={{ color: '#1a1a1a', fontWeight: 700 }}>₱{given.toFixed(2)}</span>
+                </div>
+                <div className="success-metric-row highlight">
+                  <span>Change to Give</span>
+                  <span>₱{showPayment ? change.toFixed(2) : "0.00"}</span>
+                </div>
+
+                <button 
+                  className="atp-complete-btn" 
+                  style={{ margin: 0, width: "100%" }} 
+                  onClick={handleBack}
+                >
+                  Back to Dashboard
+                </button>
+
+                {/* Wireframe Secondary Link Option */}
+                <button 
+                  className="success-secondary-btn" 
+                  onClick={handleViewTransactions}
+                >
+                  View Today's Transaction
+                </button>
+              </div>
+            </div>
+          )}
+
+          <BottomNav />
 
           <div className="atp-home-indicator">
             <div className="atp-home-bar" />

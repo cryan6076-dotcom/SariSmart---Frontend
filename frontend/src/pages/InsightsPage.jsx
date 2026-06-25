@@ -8,13 +8,13 @@ import cokeImg from "../assets/images/coke.png";
 import juiceImg from "../assets/images/juice.png";
 import pancitImg from "../assets/images/pancit.png";
 
-export default function InsightsPage() {
+export default function InsightsPage({ onNavigate }) {
   const [activeTab, setActiveTab] = useState("TODAY");
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght=400;500;600;700;800&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         .insights-page-wrapper {
@@ -321,7 +321,12 @@ export default function InsightsPage() {
             {/* Product Performance Section */}
             <div className="performance-section-header">
               <h3 className="performance-title">Product Performance</h3>
-              <a href="/performance" className="performance-view-all-link">View Ranked List</a>
+              <span 
+                className="performance-view-all-link"
+                onClick={() => onNavigate && onNavigate("top-selling")}
+              >
+                View Ranked List
+              </span>
             </div>
 
             {/* Top performing product item cards */}
@@ -358,7 +363,7 @@ export default function InsightsPage() {
           </div>
 
           {/* Completely consistent navigation bar integration */}
-          <BottomNav />
+          <BottomNav onNavigate={onNavigate} />
 
           <div className="home-indicator">
             <div className="home-bar" />
