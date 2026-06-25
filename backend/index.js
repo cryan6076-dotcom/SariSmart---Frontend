@@ -7,7 +7,7 @@ import passport from './src/passport.js';
 import { getProducts, createProduct, updateStock } from './controllers/product.js';
 import serverless from 'serverless-http'; //for serverless deployment
 import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime"; //for using bedrock ai
-import { Product } from "./models/product.js";
+import Product from "./models/product.js";
 
 const app = express();
 const bedrockClient = new BedrockRuntimeClient({ region: "ap-southeast-1" }); //initialized bedrock client
