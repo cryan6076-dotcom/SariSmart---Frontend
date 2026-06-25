@@ -18,6 +18,47 @@ export default function InventoryPage() {
   const [query, setQuery]             = useState("");
   const [activeCategory, setCategory] = useState("All");
 
+  // Add Product Modal State
+  const [isAddModalOpen, setAddModalOpen] = useState(false);
+  const [newProduct, setNewProduct] = useState({ name: '', category: categories[1] || 'Snacks', price: '', stock: '', image: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Handle adding product
+  const handleAddProduct = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    // Use the environment variable, fallback to localhost
+    const baseURI = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    const API_URL = baseURI.replace(/\/$/, "");
+
+    try {
+      const response = await fetch(`${API_URL}/api/products`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newProduct.name,
+          category: newProduct.category,
+          price: Number(newProduct.price),
+          stock: Number(newProduct.stock),
+          restockThreshold: 5,
+          image: newProduct.image || null
+        })
+      });
+      if (response.ok) {
+        const createdProduct = await response.json();
+        setProducts((prev) => [...prev, createdProduct]);
+        setAddModalOpen(false);
+        setNewProduct({ name: '', category: categories[1] || 'Snacks', price: '', stock: '', image: '' });
+      } else {
+        console.error("Failed to add product");
+      }
+    } catch (err) {
+      console.error("Error adding product:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   // Use the environment variable for API URL, fallback to localhost
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 

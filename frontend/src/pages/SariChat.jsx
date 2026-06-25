@@ -8,6 +8,17 @@ import whiteSari from "../assets/images/transparentSari.png";
 export default function SariChat() {
   const [message, setMessage] = useState("");
 
+  //State history containing message nodes (Begins with your custom greeting)
+  const [messages, setMessages] = useState([
+    {
+      sender: "ai",
+      text: "Hello! I'm your SariSmart AI Assistant. I can help you monitor stock levels, calculate metrics, and suggest item markups. Try asking me what items need restocking!",
+    }
+  ]);
+
+  //Network connection loader status tracking state
+  const [isLoading, setIsLoading] = useState(false);
+
   const suggestions = [
     "What should I restock?",
     "Suggest Markup",
@@ -16,6 +27,43 @@ export default function SariChat() {
     "Summarize my inventory",
     "Add Transaction",
   ];
+
+//Central asynchronous controller function managing AWS Bedrock transmissions
+  const handleSendMessage = async (explicitText) => {
+    const textToSend = explicitText || message.trim();
+    if (!textToSend || isLoading) return;
+
+    // Append user's chat node bubble locally to the array stream immediately
+    setMessages((prev) => [...prev, { sender: "user", text: textToSend }]);
+    setMessage(""); // Wipe input block clean
+    setIsLoading(true);
+
+    try {
+      // Cleanly strips out duplicate trailing or connecting slashes automatically
+      const baseURI = import.meta.env.VITE_API_URL || "http://localhost:3000";
+      const API_URL = baseURI.replace(/\/$/, ""); // Removes trailing slash if present
+      
+      const response = await fetch(`${API_URL}/api/ai/process`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: textToSend }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Feed the live Claude 3 dialect response back into the render thread state
+        setMessages((prev) => [...prev, { sender: "ai", text: data.displayMessage }]);
+      } else {
+        setMessages((prev) => [...prev, { sender: "ai", text: data.displayMessage || "Pasensya na, may error sa pag-proseso." }]);
+      }
+    } catch (error) {
+      console.error("AWS Gateway AI routing failure:", error);
+      setMessages((prev) => [...prev, { sender: "ai", text: "Connection failure. Hindi ma-contact ang remote server." }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
@@ -273,29 +321,29 @@ export default function SariChat() {
                 </button>
               ))}
             </div>
-
+              {/* removed hardcoded messages */}
             {/* Main Streaming Dialogue Thread Stack */}
             <div className="dialogue-stream-stack">
-              <div className="message-row-node ai-node">
-                <div className="chat-bubble-capsule">
-                  Hello! I'm your SariSmart AI Assistant. I can help you monitor stock levels, calculate metrics, and suggest item markups. Try asking me what items need restocking!
+              {/* Maps through message history array dynamically */}
+              {messages.map((msg, index) => (
+                <div 
+                  key={index} 
+                  className={`message-row-node ${msg.sender === "user" ? "user-node" : "ai-node"}`}
+                >
+                  <div className="chat-bubble-capsule">
+                    {msg.text}
+                  </div>
                 </div>
-              </div>
+              ))}
 
-              <div className="message-row-node ai-node">
-                <div className="chat-bubble-capsule">
-                  ⚠️ <strong>CRITICAL STOCK WARNING:</strong><br />
-                  Your current inventory is running dangerously low on the following fast-moving items:<br />
-                  • Coca-Cola 1.5L x 3 bottles left<br />
-                  • Eggs x 12 pieces left
+              {/* Dynamic loading node bubble placeholder */}
+              {isLoading && (
+                <div className="message-row-node ai-node" style={{ opacity: 0.7 }}>
+                  <div className="chat-bubble-capsule" style={{ fontStyle: "italic" }}>
+                    Nag-huna-huna pa si SariSmart AI...
+                  </div>
                 </div>
-              </div>
-
-              <div className="message-row-node user-node">
-                <div className="chat-bubble-capsule">
-                  Someone just bought 2 eggs, 1 Pancit Canton, and 1 Coca-Cola.
-                </div>
-              </div>
+              )}
             </div>
 
             {/* Input Submission Bar Wrapper component block */}
@@ -305,8 +353,14 @@ export default function SariChat() {
                 placeholder="Type a store query or transaction..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") handleSendMessage(); }} // Enter key support integration
+                disabled={isLoading}
               />
-              <button className="chat-send-trigger-btn" onClick={() => { if(message.trim()) setMessage(""); }}>
+              <button 
+              className="chat-send-trigger-btn" 
+              onClick={() => handleSendMessage()}
+              disabled={isLoading}
+              >
                 ➤
               </button>
             </div>
