@@ -1,3 +1,4 @@
+import { apiFetch } from "../utils/api.js";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Imported navigate hook
 import BottomNav from "../components/BottomNav";
@@ -55,7 +56,7 @@ export default function ProfilePage() {
       const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
       
       // Fetching from your dedicated transactions endpoint
-      const response = await fetch(`${API_URL}/api/transactions`);
+      const response = await apiFetch(`${API_URL}/api/transactions`);
       
       if (!response.ok) throw new Error("Failed to fetch transaction data");
       const transactions = await response.json();
@@ -113,7 +114,7 @@ export default function ProfilePage() {
       const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
       
       // Fetching from your products endpoint
-      const response = await fetch(`${API_URL}/api/products`);
+      const response = await apiFetch(`${API_URL}/api/products`);
       
       if (!response.ok) throw new Error("Failed to fetch inventory data");
       const products = await response.json();

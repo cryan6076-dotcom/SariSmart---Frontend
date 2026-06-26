@@ -9,7 +9,7 @@ const initialProducts = [
     price: 25.0,
     stock: 24,
     restockThreshold: 5,
-    image: "/src/assets/images/coke.png",
+    image: "/assets/images/coke.png",
   },
   {
     name: "Tang Orange Powdered Juice",
@@ -17,7 +17,7 @@ const initialProducts = [
     price: 20.0,
     stock: 18,
     restockThreshold: 5,
-    image: "/src/assets/images/juice.png",
+    image: "/assets/images/juice.png",
   },
   {
     name: "Pancit Canton",
@@ -25,7 +25,7 @@ const initialProducts = [
     price: 10.0,
     stock: 30,
     restockThreshold: 5,
-    image: "/src/assets/images/pancit.png",
+    image: "/assets/images/pancit.png",
   },
   {
     name: "Mega Sardines Spicy",
@@ -33,7 +33,7 @@ const initialProducts = [
     price: 35.0,
     stock: 12,
     restockThreshold: 5,
-    image: "/src/assets/images/Sardines.png",
+    image: "/assets/images/Sardines.png",
   },
   {
     name: "Eggs",
@@ -41,7 +41,7 @@ const initialProducts = [
     price: 8.0,
     stock: 2,
     restockThreshold: 5,
-    image: "https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=150&h=150&fit=crop&q=80",
+    image: "/assets/images/eggs.png",
   },
   {
     name: "SkyFlakes",
@@ -49,7 +49,7 @@ const initialProducts = [
     price: 7.0,
     stock: 4,
     restockThreshold: 5,
-    image: "/src/assets/images/SkyFlakes.jpeg",
+    image: "/assets/images/SkyFlakes.jpeg",
   }
 ];
 

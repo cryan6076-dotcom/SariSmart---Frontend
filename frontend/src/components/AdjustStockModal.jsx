@@ -1,3 +1,4 @@
+import { apiFetch } from "../utils/api.js";
 import { useState } from "react";
 import { getTranslation } from "../data/translations";
 
@@ -41,7 +42,7 @@ export default function AdjustStockModal({ product, onClose, onSaved }) {
 
     // Try to persist the new stock value
     try {
-      const res = await fetch(`${API_URL}/api/products/${product._id}`, {
+      const res = await apiFetch(`${API_URL}/api/products/${product._id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ stock: newStock }),
@@ -56,7 +57,7 @@ export default function AdjustStockModal({ product, onClose, onSaved }) {
 
     // Try to log a transaction / stock history entry
     try {
-      await fetch(`${API_URL}/api/transactions`, {
+      await apiFetch(`${API_URL}/api/transactions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

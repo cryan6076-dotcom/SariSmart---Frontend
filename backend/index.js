@@ -11,6 +11,7 @@ import { getInsights } from './controllers/insights.js';
 import serverless from 'serverless-http'; //for serverless deployment
 import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime"; //for using bedrock ai
 import Product from "./models/product.js";
+import { requireAuth } from './middleware/auth.js';
 
 const app = express();
 const bedrockClient = new BedrockRuntimeClient({ region: "ap-southeast-1" }); //initialized bedrock client
@@ -45,20 +46,20 @@ app.post('/api/auth/register', registerUser);
 app.post('/api/auth/login', loginUser);
 
 // Routes — Products API
-app.get('/api/products', getProducts);
-app.get('/api/products/:id', getProductById);
-app.post('/api/products', createProduct);
-app.put('/api/products/:id', updateProduct);
-app.patch('/api/products/:id/stock', updateStock);
-app.get('/api/products/:id/history', getProductHistory);
+app.get('/api/products', requireAuth, getProducts);
+app.get('/api/products/:id', requireAuth, getProductById);
+app.post('/api/products', requireAuth, createProduct);
+app.put('/api/products/:id', requireAuth, updateProduct);
+app.patch('/api/products/:id/stock', requireAuth, updateStock);
+app.get('/api/products/:id/history', requireAuth, getProductHistory);
 
 // Routes — Transactions API
-app.get('/api/transactions', getTransactions);
-app.post('/api/transactions', createTransaction);
+app.get('/api/transactions', requireAuth, getTransactions);
+app.post('/api/transactions', requireAuth, createTransaction);
 
 // Routes — Dashboard & Insights API
-app.get('/api/dashboard', getDashboardSummary);
-app.get('/api/insights', getInsights);
+app.get('/api/dashboard', requireAuth, getDashboardSummary);
+app.get('/api/insights', requireAuth, getInsights);
 
 // Routes — Google OAuth
 app.get('/api/auth/google',
@@ -80,7 +81,7 @@ app.get('/', (req, res) => {
 });
 
 //ai integration
-app.post("/api/ai/process", async (req, res) => {
+app.post("/api/ai/process", requireAuth, async (req, res) => {
   try {
     const { text, imageBase64 } = req.body;
 
@@ -163,7 +164,8 @@ app.post("/api/ai/process", async (req, res) => {
     // --- MONGOOSE INTEGRATION & ACCURATE FINANCIAL CALCULATIONS ---
     // Look up the product using the curly bracket structure if your import requires it
     const product = await Product.findOne({ 
-      name: { $regex: parsedData.productName, $options: "i" } 
+      name: { $regex: parsedData.productName, $options: "i" },
+      userId: req.user.id
     });
 
     if (!product) {

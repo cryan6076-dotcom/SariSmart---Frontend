@@ -1,3 +1,4 @@
+import { apiFetch } from "../utils/api.js";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -34,7 +35,7 @@ export default function ProductDetailsPage() {
     setError(null);
 
     try {
-      const res = await fetch(`${API_URL}/api/products/${id}`);
+      const res = await apiFetch(`${API_URL}/api/products/${id}`);
       if (res.ok) {
         const data = await res.json();
         setProduct(data);
@@ -43,7 +44,7 @@ export default function ProductDetailsPage() {
       throw new Error("Single product endpoint not available");
     } catch (err) {
       try {
-        const res = await fetch(`${API_URL}/api/products`);
+        const res = await apiFetch(`${API_URL}/api/products`);
         const list = await res.json();
         const found = list.find((p) => p._id === id);
         if (found) setProduct(found);
@@ -62,7 +63,7 @@ export default function ProductDetailsPage() {
     setHistoryLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/api/products/${id}/history`);
+      const res = await apiFetch(`${API_URL}/api/products/${id}/history`);
       if (res.ok) {
         const data = await res.json();
         setHistory(data);
@@ -92,7 +93,7 @@ export default function ProductDetailsPage() {
     try {
       // 1. Try to update product stock content via PATCH / PUT endpoint
       const typeStr = adjustmentType === "ADD" ? "Manual Restock" : "Stock Correction";
-      const productRes = await fetch(`${API_URL}/api/products/${id}/stock`, {
+      const productRes = await apiFetch(`${API_URL}/api/products/${id}/stock`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ stock: finalStockCount, change: numericChange, type: typeStr })

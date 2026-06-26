@@ -1,3 +1,4 @@
+import { apiFetch } from "../utils/api.js";
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { categories } from "../data/products";
@@ -53,7 +54,7 @@ export default function AddProductPage() {
 
     setSubmitting(true);
     try {
-      const response = await fetch(`${API_URL}/api/products`, {
+      const response = await apiFetch(`${API_URL}/api/products`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -1,3 +1,4 @@
+import { apiFetch } from "../utils/api.js";
 import React, { useState, useEffect } from "react";
 import BottomNav from "../components/BottomNav";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
@@ -19,7 +20,7 @@ export default function InsightsPage({ onNavigate }) {
   const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\/+$/, "");
 
   useEffect(() => {
-    fetch(`${API_URL}/api/insights?timeframe=${activeTab}`)
+    apiFetch(`${API_URL}/api/insights?timeframe=${activeTab}`)
       .then(res => res.json())
       .then(json => setData(json))
       .catch(console.error);

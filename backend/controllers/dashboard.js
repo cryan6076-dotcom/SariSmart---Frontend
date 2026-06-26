@@ -8,14 +8,15 @@ export const getDashboardSummary = async (req, res) => {
 
     // 1. Transactions from today
     const todayTransactions = await Transaction.find({
+      userId: req.user.id,
       createdAt: { $gte: today }
     }).sort({ createdAt: -1 });
 
     // 2. Recent transactions (top 5 overall)
-    const recentTransactions = await Transaction.find().sort({ createdAt: -1 }).limit(5);
+    const recentTransactions = await Transaction.find({ userId: req.user.id }).sort({ createdAt: -1 }).limit(5);
 
     // 3. Low stock items
-    const lowStockCount = await Product.countDocuments({ stock: { $lte: 5 } });
+    const lowStockCount = await Product.countDocuments({ userId: req.user.id, stock: { $lte: 5 } });
 
     // 4. Calculate metrics
     let todaySales = 0;

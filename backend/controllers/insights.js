@@ -18,6 +18,7 @@ export const getInsights = async (req, res) => {
     }
 
     const transactions = await Transaction.find({
+      userId: req.user.id,
       createdAt: { $gte: startDate }
     });
 
@@ -26,7 +27,7 @@ export const getInsights = async (req, res) => {
     const productStats = {};
     const chartMap = {};
 
-    const products = await Product.find({}, 'name category image');
+    const products = await Product.find({ userId: req.user.id }, 'name category image');
     const productMeta = {};
     products.forEach(p => {
       productMeta[p.name] = { category: p.category, image: p.image };

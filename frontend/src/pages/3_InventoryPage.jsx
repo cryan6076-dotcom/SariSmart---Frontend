@@ -1,3 +1,4 @@
+import { apiFetch } from "../utils/api.js";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
@@ -35,7 +36,7 @@ export default function InventoryPage() {
     const API_URL = baseURI.replace(/\/$/, "");
 
     try {
-      const response = await fetch(`${API_URL}/api/products`, {
+      const response = await apiFetch(`${API_URL}/api/products`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -66,7 +67,7 @@ export default function InventoryPage() {
 
   // Fetch products from database on mount
   useEffect(() => {
-    fetch(`${API_URL}/api/products`)
+    apiFetch(`${API_URL}/api/products`)
       .then((res) => res.json())
       .then((data) => {
         setProducts(data);

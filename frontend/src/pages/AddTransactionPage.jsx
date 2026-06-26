@@ -1,3 +1,4 @@
+import { apiFetch } from "../utils/api.js";
 import { useState, useEffect } from "react";
 import BottomNav from "../components/BottomNav";
 import { getTranslation } from "../data/translations";
@@ -18,7 +19,7 @@ export default function AddTransactionPage({ onNavigate }) {
   const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\/+$/, "");
 
   useEffect(() => {
-    fetch(`${API_URL}/api/products`)
+    apiFetch(`${API_URL}/api/products`)
       .then((res) => res.json())
       .then((data) => {
         setProducts(data);
@@ -105,7 +106,7 @@ export default function AddTransactionPage({ onNavigate }) {
     
     setIsSubmitting(true);
     try {
-      const response = await fetch(`${API_URL}/api/transactions`, {
+      const response = await apiFetch(`${API_URL}/api/transactions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

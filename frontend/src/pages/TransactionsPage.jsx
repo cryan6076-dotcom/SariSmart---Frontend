@@ -1,3 +1,4 @@
+import { apiFetch } from "../utils/api.js";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
@@ -13,7 +14,7 @@ export default function TransactionsPage({ onNavigate }) {
   const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\/+$/, "");
 
   useEffect(() => {
-    fetch(`${API_URL}/api/transactions`)
+    apiFetch(`${API_URL}/api/transactions`)
       .then((res) => res.json())
       .then((data) => {
         setTransactions(data);

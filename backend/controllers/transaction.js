@@ -4,7 +4,7 @@ import Product from '../models/product.js';
 // GET /api/transactions
 export const getTransactions = async (req, res) => {
   try {
-    const transactions = await Transaction.find().sort({ createdAt: -1 });
+    const transactions = await Transaction.find({ userId: req.user.id }).sort({ createdAt: -1 });
     res.status(200).json(transactions);
   } catch (error) {
     console.error('Error fetching transactions:', error);
@@ -26,7 +26,8 @@ export const createTransaction = async (req, res) => {
       total,
       amountGiven,
       change,
-      number
+      number,
+      userId: req.user.id
     });
 
     await newTransaction.save();
@@ -34,13 +35,15 @@ export const createTransaction = async (req, res) => {
     // Deduct stock for each product
     for (const item of itemsList) {
       if (item._id) {
-        await Product.findByIdAndUpdate(item._id, {
-          $inc: { stock: -item.qty }
-        });
+        await Product.findOneAndUpdate(
+          { _id: item._id, userId: req.user.id },
+          { $inc: { stock: -item.qty } }
+        );
         
         // Record stock history
         const StockHistory = (await import('../models/stockHistory.js')).default;
         await new StockHistory({
+          userId: req.user.id,
           productId: item._id,
           change: -item.qty,
           type: "Sold"

@@ -1,3 +1,4 @@
+import { apiFetch } from "../utils/api.js";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { categories } from "../data/products";
@@ -41,7 +42,7 @@ export default function EditProductPage() {
 
   useEffect(() => {
     if (!id) return;
-    fetch(`${API_URL}/api/products/${id}`)
+    apiFetch(`${API_URL}/api/products/${id}`)
       .then(res => res.json())
       .then(data => {
         setName(data.name || "");
@@ -71,7 +72,7 @@ export default function EditProductPage() {
 
     setSubmitting(true);
     try {
-      const response = await fetch(`${API_URL}/api/products/${id}`, {
+      const response = await apiFetch(`${API_URL}/api/products/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

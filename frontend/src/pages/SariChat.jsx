@@ -1,3 +1,4 @@
+import { apiFetch } from "../utils/api.js";
 import React, { useState } from "react";
 import BottomNav from "../components/BottomNav";
 
@@ -43,7 +44,7 @@ export default function SariChat() {
       const baseURI = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\/+$/, "");
       const API_URL = baseURI.replace(/\/$/, ""); // Removes trailing slash if present
       
-      const response = await fetch(`${API_URL}/api/ai/process`, {
+      const response = await apiFetch(`${API_URL}/api/ai/process`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: textToSend }),

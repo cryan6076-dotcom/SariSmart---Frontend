@@ -1,3 +1,4 @@
+import { apiFetch } from "../utils/api.js";
 import { useState, useEffect } from "react";
 import BottomNav from "../components/BottomNav";
 import FAB from "../components/FAB";
@@ -64,7 +65,7 @@ export default function HomePage({ onNavigate }) {
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
   useEffect(() => {
-    fetch(`${API_URL}/api/dashboard`)
+    apiFetch(`${API_URL}/api/dashboard`)
       .then((res) => res.json())
       .then((json) => setData(json))
       .catch(console.error);
