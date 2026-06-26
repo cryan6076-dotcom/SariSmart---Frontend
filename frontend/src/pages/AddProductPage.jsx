@@ -31,7 +31,11 @@ export default function AddProductPage() {
     const file = e.target.files[0];
     if (!file) return;
     setPhoto(file);
-    setPreview(URL.createObjectURL(file));
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
   }
 
   function validate() {
