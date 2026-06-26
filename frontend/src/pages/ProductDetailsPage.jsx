@@ -17,7 +17,7 @@ export default function ProductDetailsPage() {
   const [adjustValue, setAdjustValue]         = useState(1);
   const [isSubmittingAdjustment, setIsSubmittingAdjustment] = useState(false);
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+  const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\\/+$/, "");
 
   // Helper to safely load image assets or fall back to placeholder
   const resolveProductImage = (imageSrc, fallbackText) => {

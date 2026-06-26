@@ -10,7 +10,7 @@ export default function TransactionsPage({ onNavigate }) {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+  const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\\/+$/, "");
 
   useEffect(() => {
     fetch(`${API_URL}/api/transactions`)

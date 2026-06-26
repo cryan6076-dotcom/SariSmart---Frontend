@@ -13,8 +13,9 @@ export default function AddTransactionPage({ onNavigate }) {
   
   // State to control visibility of the success modal
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [completedTxData, setCompletedTxData] = useState(null);
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+  const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\\/+$/, "");
 
   useEffect(() => {
     fetch(`${API_URL}/api/products`)
@@ -116,6 +117,7 @@ export default function AddTransactionPage({ onNavigate }) {
       });
 
       if (response.ok) {
+        setCompletedTxData({ subtotal, given, change, showPayment });
         setShowSuccessModal(true);
         // Clear cart in background
         setCartItems([]);
@@ -688,15 +690,15 @@ export default function AddTransactionPage({ onNavigate }) {
 
                 <div className="success-metric-row">
                   <span>{t.totalBillAmount}</span>
-                  <span style={{ color: '#1a1a1a', fontWeight: 700 }}>₱{subtotal.toFixed(2)}</span>
+                  <span style={{ color: '#1a1a1a', fontWeight: 700 }}>₱{(completedTxData?.subtotal || 0).toFixed(2)}</span>
                 </div>
                 <div className="success-metric-row">
                   <span>{t.cashReceived}</span>
-                  <span style={{ color: '#1a1a1a', fontWeight: 700 }}>₱{given.toFixed(2)}</span>
+                  <span style={{ color: '#1a1a1a', fontWeight: 700 }}>₱{(completedTxData?.given || 0).toFixed(2)}</span>
                 </div>
                 <div className="success-metric-row highlight">
                   <span>{t.changeToGive}</span>
-                  <span>₱{showPayment ? change.toFixed(2) : "0.00"}</span>
+                  <span>₱{completedTxData?.showPayment ? completedTxData.change.toFixed(2) : "0.00"}</span>
                 </div>
 
                 <button 
