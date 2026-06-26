@@ -587,7 +587,7 @@ export default function AddTransactionPage({ onNavigate }) {
             {/* Cart list */}
             <div className="atp-cart-list">
               {cartItems.map((item, idx) => (
-                <div key={`${item.id}-${idx}`} className="atp-cart-item">
+                <div key={`${item._id || item.id}-${idx}`} className="atp-cart-item">
 
                   <div className="atp-item-img">
                     {item.image ? (
@@ -605,9 +605,9 @@ export default function AddTransactionPage({ onNavigate }) {
                     <div className="atp-item-name">{item.name}</div>
                     <div className="atp-item-unit-price">₱{item.price}.00</div>
                     <div className="atp-qty-row">
-                      <button className="atp-qty-btn" onClick={() => updateQty(item.id, idx, -1)}>−</button>
+                      <button className="atp-qty-btn" onClick={() => updateQty(item._id || item.id, idx, -1)}>&#8722;</button>
                       <span className="atp-qty-val">{item.qty}</span>
-                      <button className="atp-qty-btn" onClick={() => updateQty(item.id, idx, 1)}>+</button>
+                      <button className="atp-qty-btn" onClick={() => updateQty(item._id || item.id, idx, 1)}>+</button>
                     </div>
                   </div>
 
