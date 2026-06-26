@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Imported navigate hook
 import BottomNav from "../components/BottomNav";
 import { getTranslation } from "../data/translations";
+import { exportToCSV } from "../utils/exportToCSV";
 
 export default function ProfilePage() {
   const navigate = useNavigate(); // Initialized router navigation
@@ -46,6 +47,24 @@ export default function ProfilePage() {
     localStorage.setItem("openingHours", editForm.openingHours);
     
     setShowEditProfileModal(false);
+  };
+  //for exporting, with sample data
+  const handleExportSales = () => {
+    const salesData = [
+      { Date: "2026-06-24", Item: "Coke Litro", Quantity: 5, Total: 500 },
+      { Date: "2026-06-25", Item: "Sardines", Quantity: 3, Total: 135 },
+      { Date: "2026-06-26", Item: "Instant Noodles", Quantity: 10, Total: 180 }
+    ];
+    exportToCSV(salesData, "Sales_Report.csv");
+  };
+
+  const handleExportInventory = () => {
+    const inventoryData = [
+      { Item: "Coke Litro", Stock: 12, Price: 100, Category: "Beverages" },
+      { Item: "Sardines", Stock: 24, Price: 45, Category: "Canned Goods" },
+      { Item: "Instant Noodles", Stock: 50, Price: 18, Category: "Food" }
+    ];
+    exportToCSV(inventoryData, "Inventory_Report.csv");
   };
 
   const t = getTranslation(language);
@@ -518,7 +537,7 @@ export default function ProfilePage() {
             <div>
               <h3 className="section-eyebrow-label">{t.exportData}</h3>
               <div className="settings-card-group">
-                <div className="settings-row-item clickable-row">
+                <div className="settings-row-item clickable-row" onClick={handleExportSales}>
                   <div className="item-left-block">
                     <span className="item-icon-wrapper">
                       <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
