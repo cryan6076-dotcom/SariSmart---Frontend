@@ -1,46 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
-
-const TODAY_TRANSACTIONS = [
-  {
-    id: 3,
-    number: "Transaction No. 3",
-    time: "12:35 AM",
-    itemsCount: 8,
-    total: 155.00,
-    itemsList: [
-      { name: "Coke Mismo 120 ML", qty: 3, price: 75.00 },
-      { name: "Lucky Me Pancit Canton", qty: 3, price: 45.00 },
-      { name: "SkyFlakes", qty: 2, price: 35.00 }
-    ]
-  },
-  {
-    id: 2,
-    number: "Transaction No. 2",
-    time: "11:14 AM",
-    itemsCount: 4,
-    total: 85.00,
-    itemsList: [
-      { name: "Chippy BBQ", qty: 2, price: 30.00 },
-      { name: "C2 Apple 230ml", qty: 2, price: 40.00 }
-    ]
-  },
-  {
-    id: 1,
-    number: "Transaction No. 1",
-    time: "09:20 AM",
-    itemsCount: 2,
-    total: 50.00,
-    itemsList: [
-      { name: "Coke Mismo 120 ML", qty: 2, price: 50.00 }
-    ]
-  }
-];
+import { getTranslation } from "../data/translations";
 
 export default function TransactionsPage({ onNavigate }) {
   const navigate = useNavigate();
-  const [expandedTx, setExpandedTx] = useState(3); // Defaulting transaction #3 to open
+  const t = getTranslation();
+  const [expandedTx, setExpandedTx] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/transactions`)
+      .then((res) => res.json())
+      .then((data) => {
+        setTransactions(data);
+        if (data.length > 0) {
+          setExpandedTx(data[0]._id);
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch transactions:", err);
+        setLoading(false);
+      });
+  }, []);
 
   const handleBack = () => {
     if (onNavigate) onNavigate("home");
@@ -270,18 +256,25 @@ export default function TransactionsPage({ onNavigate }) {
                 <path d="M19 12H5M5 12L12 19M5 12L12 5"/>
               </svg>
             </button>
-            <span className="txp-title">Transactions</span>
+            <span className="txp-title">{t.transactionsTitle}</span>
           </div>
 
           {/* List Content */}
           <div className="txp-scroll">
-            <div className="txp-date-section">Today</div>
+            <div className="txp-date-section">{t.today}</div>
 
-            {TODAY_TRANSACTIONS.map((tx) => {
-              const isOpen = expandedTx === tx.id;
+            {loading ? (
+              <div style={{ textAlign: "center", padding: "20px" }}>{t.loadingTransactions}</div>
+            ) : transactions.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "20px" }}>{t.noTransactionsToday}</div>
+            ) : transactions.map((tx) => {
+              const isOpen = expandedTx === tx._id;
+              const timeString = new Date(tx.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              const itemsCount = tx.itemsList.reduce((sum, item) => sum + item.qty, 0);
+
               return (
-                <div key={tx.id} className={`txp-card ${isOpen ? "active" : ""}`}>
-                  <div className="txp-card-header" onClick={() => toggleExpand(tx.id)}>
+                <div key={tx._id} className={`txp-card ${isOpen ? "active" : ""}`}>
+                  <div className="txp-card-header" onClick={() => toggleExpand(tx._id)}>
                     <div className="txp-header-left">
                       <div className="txp-icon-box">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -291,7 +284,7 @@ export default function TransactionsPage({ onNavigate }) {
                       </div>
                       <div className="txp-info-block">
                         <span className="txp-number-text">{tx.number}</span>
-                        <span className="txp-time-text">{tx.time}</span>
+                        <span className="txp-time-text">{timeString}</span>
                       </div>
                     </div>
                     
@@ -309,14 +302,14 @@ export default function TransactionsPage({ onNavigate }) {
                   {/* Expansion Items Drawer */}
                   {isOpen && (
                     <div className="txp-drawer">
-                      <div className="txp-drawer-title">Itemized Items ({tx.itemsCount})</div>
+                      <div className="txp-drawer-title">{t.itemizedItems} ({itemsCount})</div>
                       {tx.itemsList.map((item, idx) => (
                         <div key={idx} className="txp-line-item">
                           <div className="txp-item-left">
                             {item.name}
                             <span className="txp-qty-pill">x{item.qty}</span>
                           </div>
-                          <div className="txp-item-right">₱{item.price.toFixed(2)}</div>
+                          <div className="txp-item-right">₱{(item.price * item.qty).toFixed(2)}</div>
                         </div>
                       ))}
                     </div>

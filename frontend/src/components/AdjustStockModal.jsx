@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getTranslation } from "../data/translations";
 
 // ── ADJUST STOCK MODAL ──
 // Usage: <AdjustStockModal product={product} onClose={() => setShowModal(false)} onSaved={(updatedProduct) => setProduct(updatedProduct)} />
@@ -10,6 +11,7 @@ import { useState } from "react";
 // product state is optimistically updated so the UI doesn't break.
 
 export default function AdjustStockModal({ product, onClose, onSaved }) {
+  const t = getTranslation();
   const [mode, setMode]         = useState("add"); // "add" | "subtract"
   const [quantity, setQuantity] = useState(0);
   const [supplier, setSupplier] = useState("");
@@ -338,7 +340,7 @@ export default function AdjustStockModal({ product, onClose, onSaved }) {
                     <path d="M12.5 16L6.5 10L12.5 4" stroke="#C2540C" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </button>
-                <span className="as-title">Product stock</span>
+                <span className="as-title">{t.productStock}</span>
               </div>
 
               {/* Add / Subtract toggle */}
@@ -347,13 +349,13 @@ export default function AdjustStockModal({ product, onClose, onSaved }) {
                   className={`as-toggle-btn ${mode === "add" ? "active-add" : ""}`}
                   onClick={() => setMode("add")}
                 >
-                  Add Stock
+                  {t.addStock}
                 </button>
                 <button
                   className={`as-toggle-btn ${mode === "subtract" ? "active-subtract" : ""}`}
                   onClick={() => setMode("subtract")}
                 >
-                  Subtract Stock
+                  {t.subtractStock}
                 </button>
               </div>
 
@@ -361,7 +363,7 @@ export default function AdjustStockModal({ product, onClose, onSaved }) {
               <div className="as-card">
 
                 <div>
-                  <div className="as-label" style={{ marginBottom: 6 }}>Current Stock</div>
+                  <div className="as-label" style={{ marginBottom: 6 }}>{t.currentStock}</div>
                   <div className="as-current-stock-value">
                     {currentStock} <span>pcs</span>
                   </div>
@@ -370,7 +372,7 @@ export default function AdjustStockModal({ product, onClose, onSaved }) {
                 <div className="as-divider" />
 
                 <div className="as-field-block">
-                  <div className="as-label">Quantity to {mode === "add" ? "Add" : "Subtract"}</div>
+                  <div className="as-label">{mode === "add" ? t.quantityToAdd : t.quantityToSubtract}</div>
                   <div className="as-stepper-row">
                     <input
                       className="as-qty-input"
@@ -394,7 +396,7 @@ export default function AdjustStockModal({ product, onClose, onSaved }) {
 
                 {quantity > 0 && (
                   <div className="as-preview-row">
-                    <span className="as-preview-label">New stock will be</span>
+                    <span className="as-preview-label">{t.newStockWillBe}</span>
                     <span className="as-preview-value">{newStock} pcs</span>
                   </div>
                 )}
@@ -402,9 +404,9 @@ export default function AdjustStockModal({ product, onClose, onSaved }) {
                 <div className="as-divider" />
 
                 <div className="as-field-block">
-                  <div className="as-label">Supplier (Optional)</div>
+                  <div className="as-label">{t.supplier}</div>
                   <div className={`as-select ${supplier ? "has-value" : ""}`}>
-                    <span>{supplier || "Select supplier"}</span>
+                    <span>{supplier || t.selectSupplier}</span>
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                       <path d="M6 4L10 8L6 12" stroke="#BBB" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
@@ -412,7 +414,7 @@ export default function AdjustStockModal({ product, onClose, onSaved }) {
                 </div>
 
                 <div className="as-field-block">
-                  <div className="as-label">Total Cost (Optional)</div>
+                  <div className="as-label">{t.totalCost}</div>
                   <input
                     className="as-input"
                     type="text"
@@ -423,10 +425,10 @@ export default function AdjustStockModal({ product, onClose, onSaved }) {
                 </div>
 
                 <div className="as-field-block">
-                  <div className="as-label">Notes (Optional)</div>
+                  <div className="as-label">{t.notes}</div>
                   <textarea
                     className="as-textarea"
-                    placeholder="Enter notes"
+                    placeholder={t.enterNotes}
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                   />
@@ -440,7 +442,7 @@ export default function AdjustStockModal({ product, onClose, onSaved }) {
                 disabled={quantity <= 0 || saving}
                 onClick={handleSave}
               >
-                {saving ? "Saving..." : "Save"}
+                {saving ? t.savingDots : t.save}
               </button>
 
             </div>

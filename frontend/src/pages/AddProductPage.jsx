@@ -1,9 +1,11 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { categories } from "../data/products";
+import { getTranslation } from "../data/translations";
 
 export default function AddProductPage() {
   const navigate = useNavigate();
+  const t = getTranslation();
 
   const [photo, setPhoto]               = useState(null);
   const [photoPreview, setPreview]      = useState(null);
@@ -34,10 +36,10 @@ export default function AddProductPage() {
 
   function validate() {
     const e = {};
-    if (!name.trim())    e.name = "Product name is required.";
-    if (!category)       e.category = "Please select a category.";
+    if (!name.trim())    e.name = t.productNameRequired;
+    if (!category)       e.category = t.selectCategoryError;
     if (!sellingPrice || isNaN(sellingPrice) || Number(sellingPrice) < 0)
-      e.sellingPrice = "Enter a valid selling price.";
+      e.sellingPrice = t.validSellingPrice;
     return e;
   }
 
@@ -392,7 +394,7 @@ export default function AddProductPage() {
                 <path d="M19 12H5M12 19l-7-7 7-7"/>
               </svg>
             </button>
-            <span className="ap-header-title">Add Product</span>
+            <span className="ap-header-title">{t.addProduct}</span>
           </div>
 
           {/* Scrollable content */}
@@ -410,7 +412,7 @@ export default function AddProductPage() {
                       <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
                       <circle cx="12" cy="13" r="4"/>
                     </svg>
-                    <span className="ap-photo-label-over">Change Photo</span>
+                    <span className="ap-photo-label-over">{t.changePhoto}</span>
                   </div>
                 ) : (
                   <>
@@ -420,7 +422,7 @@ export default function AddProductPage() {
                         <circle cx="12" cy="13" r="4"/>
                       </svg>
                     </div>
-                    <span className="ap-photo-label">Add Photo</span>
+                    <span className="ap-photo-label">{t.addPhoto}</span>
                   </>
                 )}
                 <input
@@ -437,10 +439,10 @@ export default function AddProductPage() {
 
                 {/* Product Name */}
                 <div className="ap-field">
-                  <label className="ap-label">Product Name</label>
+                  <label className="ap-label">{t.productName}</label>
                   <input
                     className={`ap-input${errors.name ? " error" : ""}`}
-                    placeholder="Enter product name"
+                    placeholder={t.enterProductName}
                     value={name}
                     onChange={(e) => { setName(e.target.value); setErrors((prev) => ({ ...prev, name: null })); }}
                   />
@@ -451,13 +453,13 @@ export default function AddProductPage() {
 
                 {/* Category */}
                 <div className="ap-field">
-                  <label className="ap-label">Category</label>
+                  <label className="ap-label">{t.category}</label>
                   <select
                     className={`ap-select${errors.category ? " error" : ""}`}
                     value={category}
                     onChange={(e) => { setCategory(e.target.value); setErrors((prev) => ({ ...prev, category: null })); }}
                   >
-                    <option value="">Select category</option>
+                    <option value="">{t.selectCategory}</option>
                     {CATS.map((c) => (
                       <option key={c} value={c}>{c}</option>
                     ))}
@@ -470,7 +472,7 @@ export default function AddProductPage() {
                 {/* Prices */}
                 <div className="ap-price-row">
                   <div className="ap-price-field">
-                    <label className="ap-label">Selling Price</label>
+                    <label className="ap-label">{t.sellingPrice}</label>
                     <div className="ap-price-input-wrap">
                       <span className="ap-peso-symbol">₱</span>
                       <input
@@ -488,8 +490,8 @@ export default function AddProductPage() {
                   </div>
                   <div className="ap-price-field">
                     <label className="ap-label">
-                      Cost Price{" "}
-                      <span style={{ fontWeight: 500, color: "#AAA", fontSize: 11 }}>(Optional)</span>
+                      {t.costPrice}{" "}
+                      <span style={{ fontWeight: 500, color: "#AAA", fontSize: 11 }}>{t.optional}</span>
                     </label>
                     <div className="ap-price-input-wrap">
                       <span className="ap-peso-symbol">₱</span>
@@ -511,7 +513,7 @@ export default function AddProductPage() {
 
                 {/* Initial Stock */}
                 <div className="ap-field">
-                  <label className="ap-label">Initial Stock</label>
+                  <label className="ap-label">{t.initialStock}</label>
                   <div className="ap-stock-row">
                     <div className="ap-stock-input-wrap">
                       <input
@@ -540,9 +542,9 @@ export default function AddProductPage() {
               {/* Low Stock Alert */}
               <div className="ap-alert-card">
                 <div className="ap-alert-info">
-                  <span className="ap-alert-title">Low Stock Alert</span>
+                  <span className="ap-alert-title">{t.lowStockAlert}</span>
                   <span className="ap-alert-sub">
-                    When stock is {lowStockAlert} {unit} or less
+                    {t.whenStockIs} {lowStockAlert} {unit} {t.orLess}
                   </span>
                 </div>
                 <div className="ap-stepper">
@@ -563,9 +565,9 @@ export default function AddProductPage() {
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="20 6 9 17 4 12"/>
                     </svg>
-                    Product Saved!
+                    {t.productSaved}
                   </>
-                ) : isSubmitting ? "Saving..." : "Save Product"}
+                ) : isSubmitting ? t.saving : t.saveProduct}
               </button>
 
             </div>
@@ -573,7 +575,7 @@ export default function AddProductPage() {
 
           {/* Success toast */}
           {saved && (
-            <div className="ap-toast">✓ Product added successfully!</div>
+            <div className="ap-toast">{t.productAddedSuccess}</div>
           )}
 
           {/* Home indicator */}

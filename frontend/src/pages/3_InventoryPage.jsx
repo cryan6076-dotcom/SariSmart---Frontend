@@ -6,12 +6,14 @@ import SearchBar from "../components/Searchbar";
 import CategoryChips from "../components/CategoryChips";
 import ProductCard from "../components/ProductCard";
 import { RestockCard, RestockSection } from "../components/RestockCard";
+import { getTranslation } from "../data/translations";
 
 // ── IMPORT SHARED DATA ──
 import { categories } from "../data/products";
 
 export default function InventoryPage() {
   const navigate = useNavigate();
+  const t = getTranslation();
 
   const [products, setProducts]       = useState([]);
   const [loading, setLoading]         = useState(true);
@@ -258,7 +260,7 @@ export default function InventoryPage() {
             <div className="inv-content">
 
               {/* Title */}
-              <div className="inv-title">INVENTORY</div>
+              <div className="inv-title">{t.inventory}</div>
 
               {/* Search + notification bell */}
               <div className="inv-search-row">
@@ -266,7 +268,7 @@ export default function InventoryPage() {
                   <SearchBar
                     value={query}
                     onChange={setQuery}
-                    placeholder="Search Products..."
+                    placeholder={t.searchProducts}
                   />
                 </div>
                 <button className="inv-notif">
@@ -279,7 +281,7 @@ export default function InventoryPage() {
               </div>
 
               {/* Add Product button → navigates to full page */}
-              <Button onClick={() => navigate("/add-product")}>Add Product</Button>
+              <Button onClick={() => navigate("/add-product")}>{t.addProduct}</Button>
 
               {/* Category chips */}
               <CategoryChips
@@ -291,7 +293,7 @@ export default function InventoryPage() {
               {/* Need Restock section */}
               <RestockSection count={loading ? 0 : restockItems.length} onViewAll={() => {}}>
                 {loading ? (
-                  <div className="empty-state" style={{ padding: "10px 0" }}>Loading restock items...</div>
+                  <div className="empty-state" style={{ padding: "10px 0" }}>{t.loadingRestockItems}</div>
                 ) : restockItems.length > 0 ? (
                   restockItems.map((item) => (
                     <RestockCard
@@ -303,7 +305,7 @@ export default function InventoryPage() {
                     />
                   ))
                 ) : (
-                  <div className="empty-state" style={{ padding: "10px 0" }}>All items well stocked!</div>
+                  <div className="empty-state" style={{ padding: "10px 0" }}>{t.allItemsWellStocked}</div>
                 )}
               </RestockSection>
 
@@ -311,10 +313,10 @@ export default function InventoryPage() {
 
             {/* All Products */}
             <div className="all-products-wrap" style={{ marginTop: 14 }}>
-              <div className="all-products-title">All Products</div>
+              <div className="all-products-title">{t.allProducts}</div>
               <div className="all-products-card">
                 {loading ? (
-                  <div className="empty-state">Loading inventory products...</div>
+                  <div className="empty-state">{t.loadingInventory}</div>
                 ) : filtered.length > 0 ? (
                   filtered.map((product) => (
                     <ProductCard
@@ -329,7 +331,7 @@ export default function InventoryPage() {
                     />
                   ))
                 ) : (
-                  <div className="empty-state">No products found.</div>
+                  <div className="empty-state">{t.noProductsFound}</div>
                 )}
               </div>
             </div>

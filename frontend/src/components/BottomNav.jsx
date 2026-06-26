@@ -1,11 +1,13 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { getTranslation } from "../data/translations";
 import aiChatbotIcon from "../assets/images/AIChatbotIcon.png";
 
 export default function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname.toLowerCase();
+  const t = getTranslation();
 
   // Check which view is running to handle visual active highlight tabs
   const isInventory = currentPath.includes("/inventory");
@@ -57,7 +59,7 @@ export default function BottomNav() {
           <polyline points="9 22 9 12 15 12 15 22" style={{ stroke: homeColor }}></polyline>
         </svg>
         <span style={{ fontSize: "11px", marginTop: "4px", color: homeColor, fontWeight: isHome ? "700" : "600", fontFamily: "sans-serif" }}>
-          Home
+          {t.navHome}
         </span>
       </button>
 
@@ -82,7 +84,7 @@ export default function BottomNav() {
           <line x1="9" y1="21" x2="9" y2="9" style={{ stroke: inventoryColor }}></line>
         </svg>
         <span style={{ fontSize: "11px", marginTop: "4px", color: inventoryColor, fontWeight: isInventory ? "700" : "600", fontFamily: "sans-serif" }}>
-          Inventory
+          {t.navInventory}
         </span>
       </button>
 
@@ -138,7 +140,7 @@ export default function BottomNav() {
           <line x1="6" y1="20" x2="6" y2="14" style={{ stroke: insightsColor }}></line>
         </svg>
         <span style={{ fontSize: "11px", marginTop: "4px", color: insightsColor, fontWeight: isInsights ? "700" : "600", fontFamily: "sans-serif" }}>
-          Insights
+          {t.navInsights}
         </span>
       </button>
 
@@ -162,7 +164,7 @@ export default function BottomNav() {
           <circle cx="12" cy="7" r="4" style={{ stroke: profileColor }}></circle>
         </svg>
         <span style={{ fontSize: "11px", marginTop: "4px", color: profileColor, fontWeight: isProfile ? "700" : "600", fontFamily: "sans-serif" }}>
-          Profile
+          {t.navProfile}
         </span>
       </button>
     </footer>

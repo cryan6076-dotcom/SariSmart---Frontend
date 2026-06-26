@@ -1,10 +1,13 @@
 import express from 'express';
-//import cors from 'cors'; commented out to let lambda do CORS
+import cors from 'cors';
 import mongoose from 'mongoose';
 import { PORT, MONGO_URI, FRONTEND_URL } from './src/config.js';
 import { registerUser, loginUser, googleCallback } from './controllers/auth.js';
 import passport from './src/passport.js';
 import { getProducts, createProduct, updateStock } from './controllers/product.js';
+import { getTransactions, createTransaction } from './controllers/transaction.js';
+import { getDashboardSummary } from './controllers/dashboard.js';
+import { getInsights } from './controllers/insights.js';
 import serverless from 'serverless-http'; //for serverless deployment
 import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime"; //for using bedrock ai
 import Product from "./models/product.js";
@@ -15,11 +18,10 @@ const bedrockClient = new BedrockRuntimeClient({ region: "ap-southeast-1" }); //
 //test for merging, can be removed afterwards
 
 // Middleware
-/*commented out below to let lambda do CORS 
 app.use(cors({
   origin: FRONTEND_URL,
   credentials: true,
-}));*/
+}));
 
 app.use(express.json());
 app.use(passport.initialize());
@@ -37,6 +39,14 @@ app.post('/api/auth/login', loginUser);
 app.get('/api/products', getProducts);
 app.post('/api/products', createProduct);
 app.patch('/api/products/:id/stock', updateStock);
+
+// Routes — Transactions API
+app.get('/api/transactions', getTransactions);
+app.post('/api/transactions', createTransaction);
+
+// Routes — Dashboard & Insights API
+app.get('/api/dashboard', getDashboardSummary);
+app.get('/api/insights', getInsights);
 
 // Routes — Google OAuth
 app.get('/api/auth/google',

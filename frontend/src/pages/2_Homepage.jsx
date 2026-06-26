@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BottomNav from "../components/BottomNav";
 import FAB from "../components/FAB";
+import { getTranslation } from "../data/translations";
 import waveMascot from "../assets/images/wavemascot1.png";
 import thumbMascot from "../assets/images/thumbupmascot1.png";
 
@@ -26,9 +27,7 @@ function TxRow({ label, sub, time }) {
       <div className="tx-icon">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <circle cx="12" cy="12" r="9.5" stroke="#1A1A1A" strokeWidth="2" />
-          {/* Top arrow pointing left */}
           <path d="M15.5 9.5H8.5M8.5 9.5L11 7M8.5 9.5L11 12" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          {/* Bottom arrow pointing right */}
           <path d="M8.5 14.5H15.5M15.5 14.5L13 12M15.5 14.5L13 17" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </div>
@@ -41,9 +40,35 @@ function TxRow({ label, sub, time }) {
   );
 }
 
-// FIXED: Destructured onNavigate from props here so the homepage can forward it
 export default function HomePage({ onNavigate }) {
-  const [showAddTransaction, setShowAddTransaction] = useState(false);
+  const [data, setData] = useState({
+    todaySales: 0,
+    profit: 0,
+    transactionsCount: 0,
+    lowStockCount: 0,
+    recentTransactions: []
+  });
+
+  const t = getTranslation();
+  const storeName = localStorage.getItem('storeName') || "Aling Nena's Store";
+  
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return t.greetingMorning;
+    if (hour < 17) return t.greetingAfternoon;
+    return t.greetingEvening;
+  };
+
+  const greetingText = getGreeting();
+
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/dashboard`)
+      .then((res) => res.json())
+      .then((json) => setData(json))
+      .catch(console.error);
+  }, []);
 
   return (
     <>
@@ -498,8 +523,8 @@ export default function HomePage({ onNavigate }) {
             {/* Header */}
             <div className="header-card">
               <div className="header-text">
-                <div className="header-greeting">Magandang Umaga! 👋</div>
-                <div className="header-store">Aling Nena's Store</div>
+                <div className="header-greeting">{greetingText}</div>
+                <div className="header-store">{storeName}</div>
               </div>
               <img src={waveMascot} alt="mascot" className="header-mascot" />
             </div>
@@ -509,10 +534,10 @@ export default function HomePage({ onNavigate }) {
               {/* Today's Sales */}
               <div className="sales-card">
                 <div className="sales-text-container">
-                  <div className="sales-eyebrow">Today's Sales</div>
-                  <div className="sales-amount">₱1,200</div>
+                  <div className="sales-eyebrow">{t.todaysSales}</div>
+                  <div className="sales-amount">₱{data.todaySales.toFixed(2)}</div>
                   <div className="sales-change">
-                    <span>↑</span> 12% higher than yesterday
+                    <span>↑</span> --
                   </div>
                 </div>
                 <BarChart />
@@ -521,20 +546,20 @@ export default function HomePage({ onNavigate }) {
               {/* Stat grid metrics rows */}
               <div className="stat-row">
                 <div className="stat-card">
-                  <span className="stat-label">Profit</span>
-                  <span className="stat-value">₱480</span>
-                  <span className="stat-sub">as of today</span>
+                  <span className="stat-label">{t.profit}</span>
+                  <span className="stat-value">₱{data.profit.toFixed(2)}</span>
+                  <span className="stat-sub">{t.asOfToday}</span>
                 </div>
                 <div className="stat-card">
-                  <span className="stat-label">Transactions</span>
-                  <span className="stat-value">67</span>
-                  <span className="stat-sub">completed</span>
+                  <span className="stat-label">{t.transactions}</span>
+                  <span className="stat-value">{data.transactionsCount}</span>
+                  <span className="stat-sub">{t.completed}</span>
                 </div>
                 {/* Optional navigation link to inventory screen */}
                 <div className="stat-card" onClick={() => onNavigate && onNavigate('inventory')}>
-                  <span className="stat-label">Need Restock</span>
-                  <span className="stat-value">22</span>
-                  <span className="stat-sub">items low</span>
+                  <span className="stat-label">{t.needRestock}</span>
+                  <span className="stat-value">{data.lowStockCount}</span>
+                  <span className="stat-sub">{t.itemsLow}</span>
                 </div>
               </div>
 
@@ -542,32 +567,34 @@ export default function HomePage({ onNavigate }) {
               <div className="tip-card">
                 <img src={thumbMascot} alt="mascot" className="tip-mascot" />
                 <div className="tip-body">
-                  <div className="tip-title">AI TIP</div>
-                  <div className="tip-text">Coffee demand increased today. Restock before Wednesday.</div>
+                  <div className="tip-title">{t.aiTip}</div>
+                  <div className="tip-text">{t.aiTipText}</div>
                 </div>
                 <span className="tip-bulb">💡</span>
               </div>
 
               {/* Big Warning Icon Left Indented Restock Banner */}
-              <div className="restock-banner" onClick={() => onNavigate && onNavigate('inventory')}>
-                <div className="restock-icon-wrap">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1F1102" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                    <line x1="12" y1="9" x2="12" y2="13"></line>
-                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                  </svg>
+              {data.lowStockCount > 0 && (
+                <div className="restock-banner" onClick={() => onNavigate && onNavigate('inventory')}>
+                  <div className="restock-icon-wrap">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1F1102" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                      <line x1="12" y1="9" x2="12" y2="13"></line>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                  </div>
+                  <div className="restock-body">
+                    <div className="restock-eyebrow">{t.needRestock}</div>
+                    <div className="restock-count">{data.lowStockCount} {t.products}</div>
+                    <div className="restock-sub">{t.viewAndRestockSoon}</div>
+                  </div>
+                  <div className="restock-chevron">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A2603" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </div>
                 </div>
-                <div className="restock-body">
-                  <div className="restock-eyebrow">Need Restock</div>
-                  <div className="restock-count">4 Products</div>
-                  <div className="restock-sub">View and Restock Soon</div>
-                </div>
-                <div className="restock-chevron">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A2603" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="9 18 15 12 9 6"></polyline>
-                  </svg>
-                </div>
-              </div>
+              )}
 
             </div>
 
@@ -575,15 +602,19 @@ export default function HomePage({ onNavigate }) {
 
             {/* Recent Activity Section */}
             <div className="activity-wrap">
-              <div className="activity-title">Recent Activity</div>
+              <div className="activity-title">{t.recentActivity}</div>
 
-              <div className="group-label">Today</div>
-              <TxRow label="Transaction No. 3" sub="View and Restock Soon" time="12:35 AM" />
-              <TxRow label="Transaction No. 2" sub="View and Restock Soon" time="11:14 AM" />
-              <TxRow label="Transaction No. 1" sub="View and Restock Soon" time="09:20 AM" />
-
-              <div className="group-label">Yesterday</div>
-              <TxRow label="Transaction No. 42" sub="View and Restock Soon" time="06:45 PM" />
+              <div className="group-label">{t.latest}</div>
+              {data.recentTransactions.length === 0 ? (
+                <div style={{ fontSize: 13, color: "#666" }}>{t.noRecentActivity}</div>
+              ) : (
+                data.recentTransactions.map(tx => {
+                  const timeStr = new Date(tx.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                  return (
+                    <TxRow key={tx._id} label={tx.number} sub={`₱${tx.total.toFixed(2)}`} time={timeStr} />
+                  );
+                })
+              )}
             </div>
 
             <div style={{ height: 110 }} />

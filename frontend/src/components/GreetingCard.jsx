@@ -1,15 +1,17 @@
 // GreetingCard.jsx
 // Usage:
 // <GreetingCard storeName="Aling Nena's Store" mascotImage={waveMascot} />
-// Greeting auto-changes based on time of day
+// Greeting auto-changes based on time of day and language setting
 
 import waveMascot from "../assets/images/wavemascot1.png";
+import { getTranslation } from "../data/translations";
 
 function getGreeting() {
+  const t = getTranslation();
   const hour = new Date().getHours();
-  if (hour < 12) return "Magandang Umaga!";
-  if (hour < 18) return "Magandang Hapon!";
-  return "Magandang Gabi!";
+  if (hour < 12) return t.greetingMorning;
+  if (hour < 18) return t.greetingAfternoon;
+  return t.greetingEvening;
 }
 
 export default function GreetingCard({

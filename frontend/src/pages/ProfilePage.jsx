@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Imported navigate hook
 import BottomNav from "../components/BottomNav";
+import { getTranslation } from "../data/translations";
 
 export default function ProfilePage() {
   const navigate = useNavigate(); // Initialized router navigation
@@ -11,11 +12,48 @@ export default function ProfilePage() {
   const [aiSuggestions, setAiSuggestions] = useState(true);
   const [restockAlerts, setRestockAlerts] = useState(true);
   const [markupSuggestions, setMarkupSuggestions] = useState(true);
+  
+  const [language, setLanguage] = useState(localStorage.getItem("language") || "English");
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+
+  const [ownerName, setOwnerName] = useState(localStorage.getItem("ownerName") || "Aling Nena");
+  const [storeName, setStoreName] = useState(localStorage.getItem("storeName") || "Aling Nena's Store");
+  const [businessAddress, setBusinessAddress] = useState(localStorage.getItem("businessAddress") || "Brgy. 123, Manila");
+  const [openingHours, setOpeningHours] = useState(localStorage.getItem("openingHours") || "6:00 AM - 10:00 PM");
+
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [editForm, setEditForm] = useState({
+    ownerName,
+    storeName,
+    businessAddress,
+    openingHours
+  });
+
+  const handleEditProfile = () => {
+    setEditForm({ ownerName, storeName, businessAddress, openingHours });
+    setShowEditProfileModal(true);
+  };
+
+  const handleSaveProfile = () => {
+    setOwnerName(editForm.ownerName);
+    setStoreName(editForm.storeName);
+    setBusinessAddress(editForm.businessAddress);
+    setOpeningHours(editForm.openingHours);
+    
+    localStorage.setItem("ownerName", editForm.ownerName);
+    localStorage.setItem("storeName", editForm.storeName);
+    localStorage.setItem("businessAddress", editForm.businessAddress);
+    localStorage.setItem("openingHours", editForm.openingHours);
+    
+    setShowEditProfileModal(false);
+  };
+
+  const t = getTranslation(language);
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght=400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         .profile-view-wrapper {
@@ -204,6 +242,115 @@ export default function ProfilePage() {
           bottom: 0; left: 0; right: 0;
         }
         .home-bar { width: 120px; height: 5px; border-radius: 3px; background: #ddd; }
+
+        
+        /* ── Language Bottom Sheet ── */
+        .bottom-sheet-overlay {
+          position: absolute;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(0,0,0,0.4);
+          z-index: 50;
+          display: flex;
+          align-items: flex-end;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.3s;
+        }
+        .bottom-sheet-overlay.open {
+          opacity: 1;
+          pointer-events: auto;
+        }
+        .bottom-sheet {
+          width: 100%;
+          background: white;
+          border-radius: 24px 24px 0 0;
+          padding: 24px 24px 40px;
+          transform: translateY(100%);
+          transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .bottom-sheet-overlay.open .bottom-sheet {
+          transform: translateY(0);
+        }
+        .bottom-sheet-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+        .bottom-sheet-title {
+          font-size: 18px;
+          font-weight: 800;
+          color: #1a1a1a;
+        }
+        .close-btn {
+          background: none;
+          border: none;
+          font-size: 24px;
+          color: #64748B;
+          cursor: pointer;
+        }
+        .lang-option {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 16px 0;
+          border-bottom: 1px solid #F1F5F9;
+          cursor: pointer;
+        }
+        .lang-option:last-child {
+          border-bottom: none;
+        }
+        .lang-name {
+          font-size: 16px;
+          font-weight: 700;
+          color: #1a1a1a;
+        }
+        .lang-local {
+          font-size: 13px;
+          font-weight: 500;
+          color: #64748B;
+        }
+        .lang-check {
+          color: #EA6113;
+        }
+
+        /* Edit Profile Form Styles to match AddTransactionPage */
+        .edit-profile-label {
+          font-size: 14px; font-weight: 700; color: #E8821A; margin-bottom: 8px; display: block; text-align: left;
+        }
+        .edit-profile-input {
+          width: 100%;
+          padding: 10px 14px;
+          border-radius: 10px;
+          border: 1.5px solid #E8821A;
+          background: white;
+          font-size: 14px;
+          font-family: 'Manrope', sans-serif;
+          font-weight: 700;
+          color: #E8821A;
+          outline: none;
+          transition: border-color 0.2s;
+        }
+        .edit-profile-input:focus {
+          border-color: #E8821A;
+          box-shadow: 0 0 0 3px rgba(232, 130, 26, 0.15);
+        }
+        .save-profile-btn {
+          width: 100%;
+          height: 52px;
+          background: #E8821A;
+          border: none;
+          border-radius: 14px;
+          font-size: 16px;
+          font-weight: 800;
+          color: white;
+          cursor: pointer;
+          font-family: 'Manrope', sans-serif;
+          transition: background 0.15s, transform 0.1s;
+          margin-top: 8px;
+        }
+        .save-profile-btn:hover { background: #C96B0A; }
+        .save-profile-btn:active { transform: scale(0.98); }
       `}</style>
 
       <div className="profile-view-wrapper">
@@ -243,82 +390,82 @@ export default function ProfilePage() {
                 </svg>
               </div>
               <div className="owner-details-layout">
-                <h2>Aling Nena</h2>
-                <p>Aling Nena's Store</p>
-                <button className="edit-profile-btn">
+                <h2>{ownerName}</h2>
+                <p>{storeName}</p>
+                <button className="edit-profile-btn" onClick={handleEditProfile}>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                   </svg>
-                  Edit Profile
+                  {t.editProfile}
                 </button>
               </div>
             </div>
 
             {/* STORE INFORMATION SECTION */}
             <div>
-              <h3 className="section-eyebrow-label">Store Information</h3>
+              <h3 className="section-eyebrow-label">{t.storeInfo}</h3>
               <div className="settings-card-group">
-                <div className="settings-row-item clickable-row">
+                <div className="settings-row-item clickable-row" onClick={handleEditProfile}>
                   <div className="item-left-block">
                     <span className="item-icon-wrapper">
                       <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"/></svg>
                     </span>
-                    Store Name
+                    {t.storeName}
                   </div>
-                  <div className="item-right-block">Aling Nena's Store <span>❯</span></div>
+                  <div className="item-right-block">{storeName} <span>❯</span></div>
                 </div>
-                <div className="settings-row-item clickable-row">
+                <div className="settings-row-item clickable-row" onClick={handleEditProfile}>
                   <div className="item-left-block">
                     <span className="item-icon-wrapper">
                       <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                     </span>
-                    Business Address
+                    {t.businessAddress}
                   </div>
-                  <div className="item-right-block">Brgy. 123, Manila <span>❯</span></div>
+                  <div className="item-right-block">{businessAddress} <span>❯</span></div>
                 </div>
-                <div className="settings-row-item clickable-row">
+                <div className="settings-row-item clickable-row" onClick={handleEditProfile}>
                   <div className="item-left-block">
                     <span className="item-icon-wrapper">
                       <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
                     </span>
-                    Opening Hours
+                    {t.openingHours}
                   </div>
-                  <div className="item-right-block">6:00 AM - 10:00 PM <span>❯</span></div>
+                  <div className="item-right-block">{openingHours} <span>❯</span></div>
                 </div>
               </div>
             </div>
 
             {/* PREFERENCES SECTION */}
             <div>
-              <h3 className="section-eyebrow-label">Preferences</h3>
+              <h3 className="section-eyebrow-label">{t.preferences}</h3>
               <div className="settings-card-group">
                 <div className="settings-row-item">
                   <div className="item-left-block">
                     <span className="item-icon-wrapper">
                       <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12.3 22c-5.52 0-10-4.48-10-10S6.78 2 12.3 2c.56 0 1.12.05 1.66.14a10.027 10.027 0 0 0-3.64 7.64c0 4.1 2.48 7.61 6.04 9.13-.91.71-2.02 1.09-3.36 1.09z"/></svg>
                     </span>
-                    Dark Mode
+                    {t.darkMode}
                   </div>
                   <div className={`toggle-switch-input ${darkMode ? "active" : ""}`} onClick={() => setDarkMode(!darkMode)}>
                     <div className="toggle-switch-handle" />
                   </div>
                 </div>
-                <div className="settings-row-item clickable-row">
+                <div className="settings-row-item clickable-row" onClick={() => setShowLanguageModal(true)}>
                   <div className="item-left-block">
                     <span className="item-icon-wrapper">
                       <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95a15.65 15.65 0 0 0-1.38-3.56A8.03 8.03 0 0 1 18.92 8zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14c-.16-.64-.26-1.31-.26-2s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56A8.03 8.03 0 0 1 5.08 16zm2.95-8H5.08a8.03 8.03 0 0 1 4.33-3.56A15.65 15.65 0 0 0 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2 0-.68.07-1.35.16-2h4.68c.09.65.16 1.32.16 2 0 .68-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 0 1-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"/></svg>
                     </span>
-                    Language
+                    {t.language}
                   </div>
-                  <div className="item-right-block">English <span>❯</span></div>
+                  <div className="item-right-block">{language} <span>❯</span></div>
                 </div>
                 <div className="settings-row-item">
                   <div className="item-left-block">
                     <span className="item-icon-wrapper">
                       <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
                     </span>
-                    Notifications
+                    {t.notifications}
                   </div>
                   <div className={`toggle-switch-input ${notifications ? "active" : ""}`} onClick={() => setNotifications(!notifications)}>
                     <div className="toggle-switch-handle" />
@@ -329,14 +476,14 @@ export default function ProfilePage() {
 
             {/* AI PREFERENCES SECTION */}
             <div>
-              <h3 className="section-eyebrow-label">AI Preferences</h3>
+              <h3 className="section-eyebrow-label">{t.aiPreferences}</h3>
               <div className="settings-card-group">
                 <div className="settings-row-item">
                   <div className="item-left-block">
                     <span className="item-icon-wrapper">
                       <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                     </span>
-                    AI Suggestions
+                    {t.aiSuggestions}
                   </div>
                   <div className={`toggle-switch-input ${aiSuggestions ? "active" : ""}`} onClick={() => setAiSuggestions(!aiSuggestions)}>
                     <div className="toggle-switch-handle" />
@@ -347,7 +494,7 @@ export default function ProfilePage() {
                     <span className="item-icon-wrapper">
                       <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
                     </span>
-                    Restock Alerts
+                    {t.restockAlerts}
                   </div>
                   <div className={`toggle-switch-input ${restockAlerts ? "active" : ""}`} onClick={() => setRestockAlerts(!restockAlerts)}>
                     <div className="toggle-switch-handle" />
@@ -358,7 +505,7 @@ export default function ProfilePage() {
                     <span className="item-icon-wrapper">
                       <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>
                     </span>
-                    Markup Suggestions
+                    {t.markupSuggestions}
                   </div>
                   <div className={`toggle-switch-input ${markupSuggestions ? "active" : ""}`} onClick={() => setMarkupSuggestions(!markupSuggestions)}>
                     <div className="toggle-switch-handle" />
@@ -369,14 +516,14 @@ export default function ProfilePage() {
 
             {/* EXPORT DATA SECTION */}
             <div>
-              <h3 className="section-eyebrow-label">Export Data</h3>
+              <h3 className="section-eyebrow-label">{t.exportData}</h3>
               <div className="settings-card-group">
                 <div className="settings-row-item clickable-row">
                   <div className="item-left-block">
                     <span className="item-icon-wrapper">
                       <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
                     </span>
-                    Sales Report
+                    {t.salesReport}
                   </div>
                   <div className="item-right-block"><span>❯</span></div>
                 </div>
@@ -385,7 +532,7 @@ export default function ProfilePage() {
                     <span className="item-icon-wrapper">
                       <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                     </span>
-                    Inventory Export
+                    {t.inventoryExport}
                   </div>
                   <div className="item-right-block"><span>❯</span></div>
                 </div>
@@ -394,14 +541,14 @@ export default function ProfilePage() {
 
             {/* SUPPORT SECTION */}
             <div>
-              <h3 className="section-eyebrow-label">Support</h3>
+              <h3 className="section-eyebrow-label">{t.support}</h3>
               <div className="settings-card-group">
                 <div className="settings-row-item clickable-row">
                   <div className="item-left-block">
                     <span className="item-icon-wrapper">
                       <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm1 16h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
                     </span>
-                    Help Center
+                    {t.helpCenter}
                   </div>
                   <div className="item-right-block"><span>❯</span></div>
                 </div>
@@ -410,7 +557,7 @@ export default function ProfilePage() {
                     <span className="item-icon-wrapper">
                       <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M11 18h2v-6h-2v6zm1-14C6.48 4 2 8.48 2 14s4.48 10 10 10 10-4.48 10-10S17.52 4 12 4zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-14h2v-2h-2v2z"/></svg>
                     </span>
-                    About SariSmart
+                    {t.about}
                   </div>
                   <div className="item-right-block"><span>❯</span></div>
                 </div>
@@ -421,7 +568,7 @@ export default function ProfilePage() {
                     <span className="item-icon-wrapper" style={{ color: '#DC2626' }}>
                       <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
                     </span>
-                    Logout
+                    {t.logout}
                   </div>
                   <div className="item-right-block" style={{ color: '#DC2626' }}>
                     <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
@@ -434,6 +581,88 @@ export default function ProfilePage() {
 
           {/* Persistent Global Bottom Menu Bar Navigation */}
           <BottomNav />
+
+          {/* Language Bottom Sheet */}
+          <div className={`bottom-sheet-overlay ${showLanguageModal ? 'open' : ''}`} onClick={() => setShowLanguageModal(false)}>
+            <div className="bottom-sheet" onClick={(e) => e.stopPropagation()}>
+              <div className="bottom-sheet-header">
+                <h3 className="bottom-sheet-title">{t.selectLanguage}</h3>
+                <button className="close-btn" onClick={() => setShowLanguageModal(false)}>×</button>
+              </div>
+              <div className="lang-list">
+                {['English', 'Filipino', 'Bisaya'].map((lang) => (
+                  <div key={lang} className="lang-option" onClick={() => { 
+                    setLanguage(lang); 
+                    localStorage.setItem("language", lang);
+                    setShowLanguageModal(false); 
+                  }}>
+                    <div>
+                      <div className="lang-name">{lang}</div>
+                      <div className="lang-local">{lang === 'English' ? 'English' : lang === 'Filipino' ? 'Tagalog' : 'Cebuano'}</div>
+                    </div>
+                    {language === lang && (
+                      <div className="lang-check">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Edit Profile Bottom Sheet */}
+          <div className={`bottom-sheet-overlay ${showEditProfileModal ? 'open' : ''}`} onClick={() => setShowEditProfileModal(false)}>
+            <div className="bottom-sheet" onClick={(e) => e.stopPropagation()} style={{ paddingBottom: '40px' }}>
+              <div className="bottom-sheet-header">
+                <h3 className="bottom-sheet-title">{t.editProfile}</h3>
+                <button className="close-btn" onClick={() => setShowEditProfileModal(false)}>×</button>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div>
+                  <label className="edit-profile-label">{t.ownerName}</label>
+                  <input 
+                    className="edit-profile-input"
+                    type="text" 
+                    value={editForm.ownerName} 
+                    onChange={(e) => setEditForm({...editForm, ownerName: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="edit-profile-label">{t.storeName}</label>
+                  <input 
+                    className="edit-profile-input"
+                    type="text" 
+                    value={editForm.storeName} 
+                    onChange={(e) => setEditForm({...editForm, storeName: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="edit-profile-label">{t.businessAddress}</label>
+                  <input 
+                    className="edit-profile-input"
+                    type="text" 
+                    value={editForm.businessAddress} 
+                    onChange={(e) => setEditForm({...editForm, businessAddress: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="edit-profile-label">{t.openingHours}</label>
+                  <input 
+                    className="edit-profile-input"
+                    type="text" 
+                    value={editForm.openingHours} 
+                    onChange={(e) => setEditForm({...editForm, openingHours: e.target.value})}
+                  />
+                </div>
+                <button className="save-profile-btn" onClick={handleSaveProfile}>
+                  {t.save}
+                </button>
+              </div>
+            </div>
+          </div>
 
           {/* iOS Device bottom line gesture zone */}
           <div className="home-indicator">

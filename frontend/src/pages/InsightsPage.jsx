@@ -1,15 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import BottomNav from "../components/BottomNav";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { getTranslation } from "../data/translations";
 
-// Bind path layouts to asset directories cleanly
-import chartPlaceholder from "../assets/images/chartPlaceholder.png"; 
 import moneyIcon from "../assets/images/moneyIcon.png";
 import cokeImg from "../assets/images/coke.png";
-import juiceImg from "../assets/images/juice.png";
-import pancitImg from "../assets/images/pancit.png";
 
 export default function InsightsPage({ onNavigate }) {
   const [activeTab, setActiveTab] = useState("TODAY");
+  const t = getTranslation();
+  const [data, setData] = useState({
+    totalRevenue: 0,
+    netProfit: 0,
+    topProducts: [],
+    chartData: []
+  });
+
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/insights?timeframe=${activeTab}`)
+      .then(res => res.json())
+      .then(json => setData(json))
+      .catch(console.error);
+  }, [activeTab]);
+
+  const resolveProductImage = (imageSrc, fallbackText) => {
+    if (!imageSrc) return cokeImg; // Use cokeImg as ultimate fallback
+    if (imageSrc.startsWith("/src/assets/")) {
+      return new URL(".." + imageSrc.substring(4), import.meta.url).href;
+    }
+    return imageSrc;
+  };
 
   return (
     <>
@@ -147,9 +169,8 @@ export default function InsightsPage({ onNavigate }) {
 
         .chart-visual-render {
           width: 100%;
-          height: auto;
-          object-fit: contain;
-          border-radius: 8px;
+          height: 200px;
+          margin-top: 10px;
         }
 
         /* ── Revenue Metric Block rows ── */
@@ -280,31 +301,42 @@ export default function InsightsPage({ onNavigate }) {
           </div>
 
           <div className="insights-scroll-body">
-            <h2 className="insights-title">Insights</h2>
+            <h2 className="insights-title">{t.insights}</h2>
 
             {/* Timed Segment Controls Tabs */}
             <div className="tabs-segmented-control">
-              {["TODAY", "WEEK", "MONTH"].map((tab) => (
-                <button 
-                  key={tab} 
-                  className={`segment-tab-btn ${activeTab === tab ? "active" : ""}`}
-                  onClick={() => setActiveTab(tab)}
-                >
-                  {tab}
-                </button>
-              ))}
+              {["TODAY", "WEEK", "MONTH"].map((tab) => {
+                const tabLabels = { TODAY: t.tabToday, WEEK: t.tabWeek, MONTH: t.tabMonth };
+                return (
+                  <button 
+                    key={tab} 
+                    className={`segment-tab-btn ${activeTab === tab ? "active" : ""}`}
+                    onClick={() => setActiveTab(tab)}
+                  >
+                    {tabLabels[tab]}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Core Revenue Analytical Vector Chart */}
             <div className="graph-card-wrapper">
               <div className="graph-meta-header">
                 <div>
-                  <div className="graph-eyebrow">Total Revenue Generated</div>
-                  <div className="graph-headline-value">₱12,450.00</div>
+                  <div className="graph-eyebrow">{t.totalRevenueGenerated}</div>
+                  <div className="graph-headline-value">₱{data.totalRevenue.toFixed(2)}</div>
                 </div>
-                <div className="graph-stat-pill">+14.2%</div>
+                <div className="graph-stat-pill">+--%</div>
               </div>
-              <img src={chartPlaceholder} alt="Revenue analytical bar chart representation" className="chart-visual-render" />
+              <div className="chart-visual-render">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={data.chartData}>
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#888' }} />
+                    <Tooltip cursor={{ stroke: '#EAEAEA', strokeWidth: 2 }} formatter={(val) => [`₱${val.toFixed(2)}`, 'Revenue']} />
+                    <Line type="monotone" dataKey="revenue" stroke="#EA6113" strokeWidth={3} dot={{ r: 4, fill: "#EA6113", strokeWidth: 2, stroke: "#FFF" }} activeDot={{ r: 6, fill: "#EA6113", stroke: "#FFF", strokeWidth: 2 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </div>
 
             {/* Profit Card Layer row info */}
@@ -313,50 +345,38 @@ export default function InsightsPage({ onNavigate }) {
                 <img src={moneyIcon} alt="currency peso tracking icon" />
               </div>
               <div className="metric-content-details">
-                <span className="metric-label-title">Calculated Store Net Profit</span>
-                <span className="metric-total-amount">₱4,120.50</span>
+                <span className="metric-label-title">{t.calculatedNetProfit}</span>
+                <span className="metric-total-amount">₱{data.netProfit.toFixed(2)}</span>
               </div>
             </div>
 
             {/* Product Performance Section */}
             <div className="performance-section-header">
-              <h3 className="performance-title">Product Performance</h3>
+              <h3 className="performance-title">{t.productPerformance}</h3>
               <span 
                 className="performance-view-all-link"
                 onClick={() => onNavigate && onNavigate("top-selling")}
               >
-                View Ranked List
+                {t.viewRankedList}
               </span>
             </div>
 
             {/* Top performing product item cards */}
             <div className="products-card-list-stack">
-              <div className="product-performance-item">
-                <img src={cokeImg} alt="Coca-Cola product asset" className="product-thumbnail-frame" />
-                <div className="product-meta-desc">
-                  <span className="product-item-title">Coca-Cola 1.5L</span>
-                  <span className="product-item-category">Beverages</span>
-                </div>
-                <span className="product-revenue-output">₱1,500.00</span>
-              </div>
-
-              <div className="product-performance-item">
-                <img src={juiceImg} alt="Tang Orange Juice product asset" className="product-thumbnail-frame" />
-                <div className="product-meta-desc">
-                  <span className="product-item-title">Tang Orange Juice</span>
-                  <span className="product-item-category">Beverages</span>
-                </div>
-                <span className="product-revenue-output">₱820.00</span>
-              </div>
-
-              <div className="product-performance-item">
-                <img src={pancitImg} alt="Lucky Me Pancit Canton product asset" className="product-thumbnail-frame" />
-                <div className="product-meta-desc">
-                  <span className="product-item-title">Lucky Me Pancit Canton</span>
-                  <span className="product-item-category">Instant Goods</span>
-                </div>
-                <span className="product-revenue-output">₱640.00</span>
-              </div>
+              {data.topProducts.length === 0 ? (
+                <div style={{ padding: 16, fontSize: 14, color: "#666" }}>{t.noDataAvailable}</div>
+              ) : (
+                data.topProducts.map((product, idx) => (
+                  <div className="product-performance-item" key={idx}>
+                    <img src={resolveProductImage(product.image, product.name)} alt={product.name} className="product-thumbnail-frame" />
+                    <div className="product-meta-desc">
+                      <span className="product-item-title">{product.name}</span>
+                      <span className="product-item-category">{product.category}</span>
+                    </div>
+                    <span className="product-revenue-output">₱{product.revenue.toFixed(2)}</span>
+                  </div>
+                ))
+              )}
             </div>
 
             <div style={{ height: 100 }} />
