@@ -61,26 +61,16 @@ export default function ProductDetailsPage() {
   async function loadHistory() {
     setHistoryLoading(true);
 
-    const candidateUrls = [
-      `${API_URL}/api/transactions?productId=${id}`,
-      `${API_URL}/api/products/${id}/transactions`,
-      `${API_URL}/api/transactions/product/${id}`,
-    ];
-
-    for (const url of candidateUrls) {
-      try {
-        const res = await fetch(url);
-        if (!res.ok) continue;
+    try {
+      const res = await fetch(`${API_URL}/api/products/${id}/history`);
+      if (res.ok) {
         const data = await res.json();
-        const list = Array.isArray(data) ? data : data.transactions || [];
-        if (list.length >= 0) {
-          setHistory(list);
-          break;
-        }
-      } catch {
-        // try next candidate
+        setHistory(data);
       }
+    } catch (err) {
+      console.error("Failed to load history:", err);
     }
+    
     setHistoryLoading(false);
   }
 
@@ -101,23 +91,16 @@ export default function ProductDetailsPage() {
 
     try {
       // 1. Try to update product stock content via PATCH / PUT endpoint
-      const productRes = await fetch(`${API_URL}/api/products/${id}`, {
+      const typeStr = adjustmentType === "ADD" ? "Manual Restock" : "Stock Correction";
+      const productRes = await fetch(`${API_URL}/api/products/${id}/stock`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ stock: finalStockCount })
+        body: JSON.stringify({ stock: finalStockCount, change: numericChange, type: typeStr })
       });
 
-      // 2. Try to save log into transactions array history stream
-      await fetch(`${API_URL}/api/transactions`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          productId: id,
-          change: numericChange,
-          type: adjustmentType === "ADD" ? "Manual Restock" : "Stock Correction",
-          date: new Date().toISOString()
-        })
-      }).catch(() => null); // Silent fallback if transaction table doesn't support manual additions
+      if (!productRes.ok) {
+        throw new Error("Failed to update stock");
+      }
 
       // Refresh our visual metrics effortlessly
       setProduct(prev => prev ? { ...prev, stock: finalStockCount } : null);

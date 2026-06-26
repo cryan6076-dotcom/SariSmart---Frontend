@@ -17,6 +17,8 @@ import AddProductPage from "./pages/AddProductPage";
 import TransactionsPage from "./pages/TransactionsPage";
 import TopSellingProductsPage from "./pages/TopSellingProductsPage"; // Import TopSellingProductsPage
 
+import EditProductPage from "./pages/EditProductPage"; 
+
 // Reusable shell layout stays in the components folder
 import PhoneFrame from "./components/PhoneFrame/PhoneFrame";
 
@@ -70,6 +72,7 @@ function AppRoutes() {
 
       {/* Add New Product View screen route configuration */}
       <Route path="/add-product" element={<AddProductPage onNavigate={(page) => navigate(`/${page}`)} />} />
+      <Route path="/edit-product/:id" element={<EditProductPage />} />
 
       {/* Catch-all redirection */}
       <Route path="*" element={<Navigate to="/" replace />} />

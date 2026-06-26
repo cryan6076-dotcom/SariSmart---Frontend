@@ -37,6 +37,14 @@ export const createTransaction = async (req, res) => {
         await Product.findByIdAndUpdate(item._id, {
           $inc: { stock: -item.qty }
         });
+        
+        // Record stock history
+        const StockHistory = (await import('../models/stockHistory.js')).default;
+        await new StockHistory({
+          productId: item._id,
+          change: -item.qty,
+          type: "Sold"
+        }).save();
       }
     }
 

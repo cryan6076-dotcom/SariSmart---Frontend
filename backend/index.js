@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import { PORT, MONGO_URI, FRONTEND_URL, ALLOWED_ORIGINS } from './src/config.js';
 import { registerUser, loginUser, googleCallback } from './controllers/auth.js';
 import passport from './src/passport.js';
-import { getProducts, createProduct, updateStock } from './controllers/product.js';
+import { getProducts, createProduct, updateStock, getProductById, updateProduct, getProductHistory } from './controllers/product.js';
 import { getTransactions, createTransaction } from './controllers/transaction.js';
 import { getDashboardSummary } from './controllers/dashboard.js';
 import { getInsights } from './controllers/insights.js';
@@ -46,8 +46,11 @@ app.post('/api/auth/login', loginUser);
 
 // Routes — Products API
 app.get('/api/products', getProducts);
+app.get('/api/products/:id', getProductById);
 app.post('/api/products', createProduct);
+app.put('/api/products/:id', updateProduct);
 app.patch('/api/products/:id/stock', updateStock);
+app.get('/api/products/:id/history', getProductHistory);
 
 // Routes — Transactions API
 app.get('/api/transactions', getTransactions);
