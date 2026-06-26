@@ -1,20 +1,54 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Imported navigate hook
-import BottomNav from "../components/BottomNav";
+  import React, { useState } from "react";
+  import { useNavigate } from "react-router-dom"; // Imported navigate hook
+  import BottomNav from "../components/BottomNav";
+  import { exportToCSV } from "../utils/exportCsv";
+  export default function ProfilePage() {
+    const navigate = useNavigate(); // Initialized router navigation
 
-export default function ProfilePage() {
-  const navigate = useNavigate(); // Initialized router navigation
+    // Toggle states matching the UI preferences panels
+    const [darkMode, setDarkMode] = useState(false);
+    const [notifications, setNotifications] = useState(true);
+    const [aiSuggestions, setAiSuggestions] = useState(true);
+    const [restockAlerts, setRestockAlerts] = useState(true);
+    const [markupSuggestions, setMarkupSuggestions] = useState(true);
 
-  // Toggle states matching the UI preferences panels
-  const [darkMode, setDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState(true);
-  const [aiSuggestions, setAiSuggestions] = useState(true);
-  const [restockAlerts, setRestockAlerts] = useState(true);
-  const [markupSuggestions, setMarkupSuggestions] = useState(true);
+    // ── ON-DEMAND INVENTORY EXPORT ──
+  const handleExportInventory = async () => {
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    
+    try {
+      // 1. Fetch data directly from backend
+      const response = await fetch(`${API_URL}/api/products`);
+      if (!response.ok) throw new Error("Failed to fetch inventory");
+      const products = await response.json();
 
-  return (
-    <>
-      <style>{`
+      if (!products || products.length === 0) {
+        alert("Your inventory is currently empty!");
+        return;
+      }
+
+      // 2. Format cleanly for Excel/Google Sheets
+      const cleanData = products.map(item => ({
+        "Product Name": item.name,
+        "Category": item.category,
+        "Price (PHP)": item.price,
+        "Current Stock": item.stock,
+        "Restock Threshold": item.restockThreshold || 5
+      }));
+
+      // 3. Trigger download
+      const today = new Date().toISOString().split('T')[0];
+      exportToCSV(cleanData, `SariSmart_Inventory_${today}.csv`);
+
+    } catch (err) {
+      console.error("Export failed:", err);
+      alert("Oops! Could not export data right now. Check your connection.");
+    }
+  };
+
+    return (
+      <>
+        <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Manrope:wght=400;500;600;700;800&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -371,7 +405,7 @@ export default function ProfilePage() {
             <div>
               <h3 className="section-eyebrow-label">Export Data</h3>
               <div className="settings-card-group">
-                <div className="settings-row-item clickable-row">
+                <div className="settings-row-item clickable-row" onClick={handleExportInventory}>
                   <div className="item-left-block">
                     <span className="item-icon-wrapper">
                       <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
