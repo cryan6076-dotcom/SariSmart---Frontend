@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
 import Button from "../components/Button";
 import SearchBar from "../components/Searchbar";
@@ -6,11 +7,12 @@ import CategoryChips from "../components/CategoryChips";
 import ProductCard from "../components/ProductCard";
 import { RestockCard, RestockSection } from "../components/RestockCard";
 
-
-// ── IMPORT SHARED DATA (Replaces old hardcoded arrays) ──
+// ── IMPORT SHARED DATA ──
 import { categories } from "../data/products";
 
 export default function InventoryPage() {
+  const navigate = useNavigate();
+
   const [products, setProducts]       = useState([]);
   const [loading, setLoading]         = useState(true);
   const [query, setQuery]             = useState("");
@@ -27,7 +29,8 @@ export default function InventoryPage() {
     setIsSubmitting(true);
 
     // Use the environment variable, fallback to localhost
-    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    const baseURI = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    const API_URL = baseURI.replace(/\/$/, "");
 
     try {
       const response = await fetch(`${API_URL}/api/products`, {
@@ -57,7 +60,7 @@ export default function InventoryPage() {
     }
   };
   // Use the environment variable for API URL, fallback to localhost
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
   // Fetch products from database on mount
   useEffect(() => {
@@ -83,10 +86,9 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
     return matchCat && matchQ;
   });
 
-  // Helper function to safely load image assets or fall back to fallback UI icons
+  // Helper function to safely load image assets or fall back to placeholder
   const resolveProductImage = (imageSrc, fallbackText) => {
     if (!imageSrc) return "https://via.placeholder.com/150?text=" + encodeURIComponent(fallbackText);
-    // If it's a relative path in assets, resolve using Vite dynamic asset helper
     if (imageSrc.startsWith("/src/assets/")) {
       return new URL(".." + imageSrc.substring(4), import.meta.url).href;
     }
@@ -140,7 +142,7 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
           overflow-y: auto;
           overflow-x: hidden;
           scrollbar-width: none;
-          padding-bottom: 90px; /* Gives padding space above bottom navigation bar positioning */
+          padding-bottom: 90px;
         }
         .inv-scroll::-webkit-scrollbar { display: none; }
 
@@ -225,61 +227,6 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
           border-radius: 3px;
           background: #DDD;
         }
-
-        /* Modal Styles */
-        .modal-overlay {
-          position: absolute;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0,0,0,0.5);
-          z-index: 100;
-          display: flex;
-          align-items: flex-end;
-          justify-content: center;
-        }
-        .modal-content {
-          width: 100%;
-          background: white;
-          border-top-left-radius: 24px;
-          border-top-right-radius: 24px;
-          padding: 24px;
-          padding-bottom: 40px;
-          animation: slideUp 0.3s ease-out;
-        }
-        @keyframes slideUp {
-          from { transform: translateY(100%); }
-          to { transform: translateY(0); }
-        }
-        .modal-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 20px;
-        }
-        .modal-title {
-          font-size: 18px;
-          font-weight: 800;
-          color: #1A1A1A;
-        }
-        .close-btn {
-          background: none; border: none; font-size: 20px; color: #888; cursor: pointer;
-        }
-        .form-group {
-          margin-bottom: 16px;
-        }
-        .form-label {
-          display: block; font-size: 13px; font-weight: 700; color: #555; margin-bottom: 6px;
-        }
-        .form-input, .form-select {
-          width: 100%;
-          padding: 12px;
-          border-radius: 12px;
-          border: 1px solid #EAEAEA;
-          font-size: 14px;
-          font-family: inherit;
-        }
-        .form-input:focus, .form-select:focus {
-          outline: none; border-color: #E8821A;
-        }
       `}</style>
 
       <div className="inv-wrapper">
@@ -331,8 +278,8 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
                 </button>
               </div>
 
-              {/* Add Product button */}
-              <Button onClick={() => setAddModalOpen(true)}>Add Product</Button>
+              {/* Add Product button → navigates to full page */}
+              <Button onClick={() => navigate("/add-product")}>Add Product</Button>
 
               {/* Category chips */}
               <CategoryChips
@@ -351,7 +298,6 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
                       key={item._id}
                       name={item.name}
                       stock={item.stock}
-                      // FIXED: Resolves actual dynamic or default placeholder images smoothly
                       image={resolveProductImage(item.image, item.name)}
                       onRestock={() => {}}
                     />
@@ -378,9 +324,8 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
                       category={product.category}
                       price={product.price}
                       stock={product.stock}
-                      // FIXED: Resolves custom thumbnail image files safely 
                       image={resolveProductImage(product.image, product.name)}
-                      onPress={() => {}}
+                      onPress={() => navigate(`/product/${product._id}`)}
                     />
                   ))
                 ) : (
@@ -397,49 +342,6 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
           <div className="home-indicator">
             <div className="home-bar" />
           </div>
-
-          {/* Add Product Modal Overlay */}
-          {isAddModalOpen && (
-            <div className="modal-overlay" onClick={() => setAddModalOpen(false)}>
-              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-header">
-                  <div className="modal-title">Add New Product</div>
-                  <button className="close-btn" onClick={() => setAddModalOpen(false)}>&times;</button>
-                </div>
-                <form onSubmit={handleAddProduct}>
-                  <div className="form-group">
-                    <label className="form-label">Name</label>
-                    <input required className="form-input" placeholder="e.g. Pancit Canton" value={newProduct.name} onChange={(e) => setNewProduct({...newProduct, name: e.target.value})} />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Category</label>
-                    <select className="form-select" value={newProduct.category} onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}>
-                      {categories.filter(c => c !== "All").map(c => (
-                        <option key={c} value={c}>{c}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="form-group" style={{ display: 'flex', gap: 10 }}>
-                    <div style={{ flex: 1 }}>
-                      <label className="form-label">Price (₱)</label>
-                      <input required type="number" min="0" step="0.01" className="form-input" placeholder="0.00" value={newProduct.price} onChange={(e) => setNewProduct({...newProduct, price: e.target.value})} />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <label className="form-label">Initial Stock</label>
-                      <input required type="number" min="0" className="form-input" placeholder="0" value={newProduct.stock} onChange={(e) => setNewProduct({...newProduct, stock: e.target.value})} />
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Image URL (Optional)</label>
-                    <input className="form-input" placeholder="https://..." value={newProduct.image} onChange={(e) => setNewProduct({...newProduct, image: e.target.value})} />
-                  </div>
-                  <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Adding..." : "Add Product"}
-                  </Button>
-                </form>
-              </div>
-            </div>
-          )}
 
         </div>
       </div>
