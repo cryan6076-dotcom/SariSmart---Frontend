@@ -7,3 +7,10 @@ export const JWT_SECRET = process.env.JWT_SECRET || 'YOUR_SECRET_KEY';
 export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 export const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 export const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+// All origins allowed for CORS (both production and local development)
+export const ALLOWED_ORIGINS = [
+  'https://main.d1rxe9jap0y97p.amplifyapp.com',
+  'http://localhost:5173',
+  'http://localhost:3000',
+];

@@ -6,11 +6,11 @@ frontend:
         - npm --prefix frontend install
     build:
       commands:
-        - npm --prefix frontend run build
+        - VITE_API_URL=https://olqjxmkedpgnccwbwbqpk7kmui0bvcem.lambda-url.ap-southeast-1.on.aws npm --prefix frontend run build
   artifacts:
     baseDirectory: frontend/dist
     files:
       - '**/*'
   cache:
     paths:
-      - node_modules/**/*
+      - node_modules/**/*

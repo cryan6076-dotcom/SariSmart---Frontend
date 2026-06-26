@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import { PORT, MONGO_URI, FRONTEND_URL } from './src/config.js';
+import { PORT, MONGO_URI, FRONTEND_URL, ALLOWED_ORIGINS } from './src/config.js';
 import { registerUser, loginUser, googleCallback } from './controllers/auth.js';
 import passport from './src/passport.js';
 import { getProducts, createProduct, updateStock } from './controllers/product.js';
@@ -19,7 +19,14 @@ const bedrockClient = new BedrockRuntimeClient({ region: "ap-southeast-1" }); //
 
 // Middleware
 app.use(cors({
-  origin: FRONTEND_URL,
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, server-to-server)
+    if (!origin) return callback(null, true);
+    if (ALLOWED_ORIGINS.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
 }));
 
