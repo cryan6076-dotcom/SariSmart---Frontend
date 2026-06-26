@@ -50,6 +50,7 @@ export default function ProfilePage() {
   };
   //for exporting, with sample data
   const handleExportSales = () => {
+    console.log("!!! EXPORT BUTTON WAS PLAINLY CLICKED !!!");
     const salesData = [
       { Date: "2026-06-24", Item: "Coke Litro", Quantity: 5, Total: 500 },
       { Date: "2026-06-25", Item: "Sardines", Quantity: 3, Total: 135 },
