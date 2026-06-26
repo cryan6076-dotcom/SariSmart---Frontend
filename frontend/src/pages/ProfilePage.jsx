@@ -60,6 +60,7 @@ export default function ProfilePage() {
   };
 
   const handleExportInventory = () => {
+    console.log("!!! EXPORT BUTTON WAS PLAINLY CLICKED !!!");
     const inventoryData = [
       { Item: "Coke Litro", Stock: 12, Price: 100, Category: "Beverages" },
       { Item: "Sardines", Stock: 24, Price: 45, Category: "Canned Goods" },
@@ -603,7 +604,8 @@ export default function ProfilePage() {
           <BottomNav />
 
           {/* Language Bottom Sheet */}
-          <div className={`bottom-sheet-overlay ${showLanguageModal ? 'open' : ''}`} onClick={() => setShowLanguageModal(false)}>
+          {showLanguageModal && (
+          <div className="bottom-sheet-overlay open" onClick={() => setShowLanguageModal(false)}>
             <div className="bottom-sheet" onClick={(e) => e.stopPropagation()}>
               <div className="bottom-sheet-header">
                 <h3 className="bottom-sheet-title">{t.selectLanguage}</h3>
@@ -632,9 +634,11 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
+          )}
 
           {/* Edit Profile Bottom Sheet */}
-          <div className={`bottom-sheet-overlay ${showEditProfileModal ? 'open' : ''}`} onClick={() => setShowEditProfileModal(false)}>
+          {showEditProfileModal && (
+          <div className="bottom-sheet-overlay open" onClick={() => setShowEditProfileModal(false)}>
             <div className="bottom-sheet" onClick={(e) => e.stopPropagation()} style={{ paddingBottom: '40px' }}>
               <div className="bottom-sheet-header">
                 <h3 className="bottom-sheet-title">{t.editProfile}</h3>
@@ -683,6 +687,7 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
+          )}
 
           {/* iOS Device bottom line gesture zone */}
           <div className="home-indicator">
