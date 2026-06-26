@@ -16,7 +16,7 @@ export default function InsightsPage({ onNavigate }) {
     chartData: []
   });
 
-  const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\\/+$/, "");
+  const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\/+$/, "");
 
   useEffect(() => {
     fetch(`${API_URL}/api/insights?timeframe=${activeTab}`)

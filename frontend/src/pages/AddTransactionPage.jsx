@@ -15,7 +15,7 @@ export default function AddTransactionPage({ onNavigate }) {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [completedTxData, setCompletedTxData] = useState(null);
 
-  const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\\/+$/, "");
+  const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\/+$/, "");
 
   useEffect(() => {
     fetch(`${API_URL}/api/products`)
