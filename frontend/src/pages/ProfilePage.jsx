@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom"; // Imported navigate hook
 import BottomNav from "../components/BottomNav";
 import { getTranslation } from "../data/translations";
 import { exportToCSV } from "../utils/exportToCSV";
+import { useTheme } from "../context/ThemeContext";
 
 export default function ProfilePage() {
   const navigate = useNavigate(); // Initialized router navigation
 
   // Toggle states matching the UI preferences panels
-  const [darkMode, setDarkMode] = useState(false);
+  const { isDarkMode, toggleDarkMode } = useTheme();
   const [notifications, setNotifications] = useState(true);
   const [aiSuggestions, setAiSuggestions] = useState(true);
   const [restockAlerts, setRestockAlerts] = useState(true);
@@ -558,7 +559,7 @@ export default function ProfilePage() {
                     </span>
                     {t.darkMode}
                   </div>
-                  <div className={`toggle-switch-input ${darkMode ? "active" : ""}`} onClick={() => setDarkMode(!darkMode)}>
+                  <div className={`toggle-switch-input ${isDarkMode ? "active" : ""}`} onClick={toggleDarkMode}>
                     <div className="toggle-switch-handle" />
                   </div>
                 </div>
