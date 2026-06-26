@@ -1,7 +1,7 @@
   import React, { useState } from "react";
   import { useNavigate } from "react-router-dom"; // Imported navigate hook
   import BottomNav from "../components/BottomNav";
-  import { exportToCSV } from "../utils/exportCsv";
+  import { exportToCSV } from "../utils/exportToCSV"; // Import the CSV export utility
   export default function ProfilePage() {
     const navigate = useNavigate(); // Initialized router navigation
 
